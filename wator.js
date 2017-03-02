@@ -15,6 +15,8 @@ App.Start = function(){
 	
     App.Init();
 
+    fish = new Fish();
+
 	setTimeout("App.Run()", this.INTERVAL);
 };
 
@@ -24,12 +26,25 @@ App.Init = function(){
 
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 //	ctx.scale(1, -1);
+	canvas.addEventListener('click', function(e) {
+		var rect = canvas.getBoundingClientRect();
+    	var x = event.clientX - rect.left;
+    	var y = event.clientY - rect.top;
+		App.MouseClick(x, y);
+	});
+};
+
+App.MouseClick = function(x, y) {
+	fish.UpdatePosition(x, y);
 };
 
 App.Run = function(){
 
-	var fish = new Fish();
+	ctx.fillStyle = "#DDDDDD";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	//ctx.clearRect(0, 0, canvas.width, canvas.height);
 	fish.Draw(ctx);
+	setTimeout("App.Run()", this.INTERVAL);
 };
 
 
