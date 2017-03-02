@@ -1,15 +1,17 @@
 Fish = function() {
 	this.posX = 100;
 	this.posY = 100;
-	this.interpolator = new Interpolator([this.posX, this.posX, 0], [this.posY, this.posY, 0]);
+	this.interpolatorX = new Interpolator([this.posX, 0, 0, this.posX, 0]);
+	this.interpolatorY = new Interpolator([this.posY, 0, 0, this.posY, 0]);
 	this.interpolationStart = Date.now();
 };
 
 Fish.prototype.Draw = function(ctx) {
 
-	var data = this.interpolator.Eval(this.InterpolationTime());
-	this.posX = data[0];
-	this.posY = data[1];
+	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
+	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
+	this.posX = dataX[0];
+	this.posY = dataY[0];
 
 	ctx.beginPath();
 	ctx.arc(this.posX, this.posY, 10, 0, 2 * Math.PI, false);
@@ -18,40 +20,44 @@ Fish.prototype.Draw = function(ctx) {
 	ctx.strokeStyle = '#ff0000';
 	ctx.beginPath();
 	ctx.moveTo(this.posX, this.posY);
-	ctx.lineTo(this.posX + data[2] / 10, this.posY + data[3] / 10);
+	ctx.lineTo(this.posX + dataX[1] / 10, this.posY + dataY[1] / 10);
 	ctx.stroke();
 };
 
 Fish.prototype.UpdatePosition = function(x, y) {
 
-	var data = this.interpolator.Eval(this.InterpolationTime());
-	var velocityAbs = Math.sqrt(data[2]*data[2] + data[3]*data[3]);
-	var velocityScalar = velocityAbs == 0 ? 1 : 100 / velocityAbs;
-	this.interpolator = new Interpolator([data[0], x, data[2] * velocityScalar], [data[1], y, data[3] * velocityScalar]);
+	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
+	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
+
+	this.interpolatorX = new Interpolator([dataX[0], dataX[1], -dataX[2]/2, x, 0]);
+	this.interpolatorY = new Interpolator([dataY[0], dataY[1], -dataY[2]/2, y, 0]);
 	this.interpolationStart = Date.now();
 };
 
 Fish.prototype.InterpolationTime = function() {
 	var dt = Math.min(Math.max(Date.now() - this.interpolationStart, 0) / 1000, 1);
-	return 1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
+	return dt; //return 1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
 };
 
 
 // cubic interpolation for smooth movement
 
-Interpolator = function(dataX, dataY) {
+Interpolator = function(data) {
 
-	var invMat = [[-1, 1, -1], [0, 0, 1], [1, 0, 0]];
+	var inverse = [	[3, 2, 1/2, -3, 1], 
+					[-4, -3, -1, 4, -1], 
+					[0, 0, 1/2, 0, 0], 
+					[0, 1, 0, 0, 0], 
+					[1, 0, 0, 0, 0]];
 
-	this.coefX = MatrixVectorMult(invMat, dataX);
-	this.coefY = MatrixVectorMult(invMat, dataY);
+	this.coef = MatrixVectorMult(inverse, data);
 };
 
 Interpolator.prototype.Eval= function(t) {
-	return [	this.coefX[0]*t*t + this.coefX[1]*t + this.coefX[2], // positions
-				this.coefY[0]*t*t + this.coefY[1]*t + this.coefY[2],
-				2*this.coefX[0]*t + this.coefX[1],// velocities
-				2*this.coefY[0]*t + this.coefY[1]];
+	return [	this.coef[0]*t*t*t*t + this.coef[1]*t*t*t + this.coef[2]*t*t + this.coef[3]*t + this.coef[4], // positions
+				4*this.coef[0]*t*t*t + 3*this.coef[1]*t*t + 2*this.coef[2]*t + this.coef[3], // velocities
+				12*this.coef[0]*t*t + 6*this.coef[1]*t + 2*this.coef[2]]; // curvature
+
 };
 
 // utility stuff
