@@ -14,7 +14,7 @@ App.Start = function(){
     ctx = canvas.getContext('2d');
 	
     App.Init();
-
+    
     fish = new Fish(Math.random());
     lastUpdate = Date.now();
 

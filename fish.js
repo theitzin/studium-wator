@@ -1,105 +1,59 @@
 Fish = function(seed) {
 	this.position = new Vec2(100, 100);
+	this.velocity = new Vec2(0, 0);
+	this.acceleration = new Vec2(0, 0);
 	this.direction = new Vec2(Math.cos(seed*2*Math.PI), Math.sin(seed*2*Math.PI));
+	
 	this.interpolatorX = new Interpolator([this.position.x, 0, 0, this.position.x, 0]);
 	this.interpolatorY = new Interpolator([this.position.y, 0, 0, this.position.y, 0]);
 	this.interpolationStart = Date.now();
 
-	this.headLength = 20;
-	this.bodyLength = 35;
-	this.buttLength = 23;
-	this.tailLength = 24;
-	this.headWidth = 13;
-	this.bodyWidth = 7;
-	this.buttWidth = 4;
-	this.tailWidth = 14;
-	this.butt;
-	this.tail;
-
-	this.animationtime = Date.now() / 1000;
-	this.velocityOld = new Vec2(0, 0);
-	this.acceleration = new Vec2(0, 0);
+	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
+	this.colors = ['#9097a0', '#70757c', '#565b63'];
+	this.animationtime = Math.random();
 };
 
 Fish.prototype.Draw = function(ctx) {
 
+	// movement data processing
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
+
 	this.position.set(dataX[0], dataY[0]);
 	var tmp = new Vec2(dataX[1], dataY[1]);
 	if (tmp.length2() > 1)
 		this.direction.copy(tmp).normalize();
 
-	var aTmp = new Vec2(dataX[1] - this.velocityOld.x, dataY[1] - this.velocityOld.y);
-	this.acceleration.scale(0.9).add(aTmp.scale(0.08));
+	var aTmp = new Vec2(dataX[1] - this.velocity.x, dataY[1] - this.velocity.y);
+	this.acceleration.scale(0.9).add(aTmp.scale(0.1));
 	var aTangential = this.acceleration.dot(this.direction);
 	var aNormal = this.acceleration.dot(this.direction.ortho());
-	this.velocityOld.set(dataX[1], dataY[1]);
+	this.velocity.set(dataX[1], dataY[1]);
 
-	this.animationtime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 40, 0.5);
+	this.animationtime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 20, 0.5);
+	var scaledBodyLength = this.dimensions[1] - Math.abs(aNormal / 2);
 
-	this.head = this.direction.clone().rotate(-Math.sin(this.animationtime) / 8 + aNormal / 40);
-	this.butt = this.direction.clone().scale(-1).rotate(Math.sin(this.animationtime) / 4);
-	this.tail = this.direction.clone().scale(-1).rotate(-Math.cos(this.animationtime) / 3);
-	var scaledBodyLength = this.bodyLength - Math.abs(aNormal / 2);
+	// anchor points
+	var head = this.direction.clone().rotate(-Math.sin(this.animationtime) / 8 + aNormal / 40);
+	var butt = this.direction.clone().scale(-1).rotate(Math.sin(this.animationtime) / 4);
+	var tail = this.direction.clone().scale(-1).rotate(-Math.cos(this.animationtime) / 3);
 
-	var headTop = this.position.clone().addScaled(this.direction, scaledBodyLength).addScaled(this.head, this.headLength);
-	var headRight = this.position.clone().addScaled(this.direction, scaledBodyLength).addScaled(this.head.ortho(), this.headWidth);
-	var headLeft = headRight.clone().addScaled(this.head.ortho(), -2*this.headWidth);
-	var bodyRight = this.position.clone().addScaled(this.direction.ortho(), this.bodyWidth);
-	var bodyLeft = this.position.clone().addScaled(this.direction.ortho(), -this.bodyWidth);
-	var buttRight = this.position.clone().addScaled(this.butt, this.buttLength).addScaled(this.butt.ortho(), -this.buttWidth);
-	var buttLeft = buttRight.clone().addScaled(this.butt.ortho(), 2*this.buttWidth);
-	var tailRight = this.position.clone().addScaled(this.butt, this.buttLength).addScaled(this.tail, this.tailLength).addScaled(this.tail.ortho(), -this.tailWidth);
-	var tailLeft = tailRight.clone().addScaled(this.tail.ortho(), 2*this.tailWidth);
-	var tailMiddle = this.position.clone().addScaled(this.butt, this.buttLength).addScaled(this.tail, this.tailLength / 2);
+	// body points
+	var headTop = this.position.clone().addScaled(this.direction, scaledBodyLength).addScaled(head, this.dimensions[0]);
+	var headRight = this.position.clone().addScaled(this.direction, scaledBodyLength).addScaled(head.ortho(), this.dimensions[1]);
+	var headLeft = headRight.clone().addScaled(head.ortho(), -2*this.dimensions[1]);
+	var bodyRight = this.position.clone().addScaled(this.direction.ortho(), this.dimensions[3]);
+	var bodyLeft = this.position.clone().addScaled(this.direction.ortho(), -this.dimensions[3]);
+	var buttRight = this.position.clone().addScaled(butt, this.dimensions[4]).addScaled(butt.ortho(), -this.dimensions[5]);
+	var buttLeft = buttRight.clone().addScaled(butt.ortho(), 2*this.dimensions[5]);
+	var tailRight = this.position.clone().addScaled(butt, this.dimensions[4]).addScaled(tail, this.dimensions[6]).addScaled(tail.ortho(), -this.dimensions[7]);
+	var tailLeft = tailRight.clone().addScaled(tail.ortho(), 2*this.dimensions[7]);
+	var tailMiddle = this.position.clone().addScaled(butt, this.dimensions[4]).addScaled(tail, this.dimensions[6] / 2);
 
-	ctx.fillStyle = '#9097a0';
-	ctx.beginPath();
-	ctx.moveTo(headTop.x, headTop.y);
-	ctx.lineTo(headRight.x, headRight.y);
-	ctx.lineTo(bodyRight.x, bodyRight.y);
-	ctx.lineTo(headTop.x, headTop.y);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.moveTo(headTop.x, headTop.y);
-	ctx.lineTo(headLeft.x, headLeft.y);
-	ctx.lineTo(bodyLeft.x, bodyLeft.y);
-	ctx.lineTo(headTop.x, headTop.y);
-	ctx.fill();
-	ctx.fillStyle = '#70757c';
-	ctx.beginPath();
-	ctx.moveTo(headTop.x, headTop.y);
-	ctx.lineTo(bodyRight.x, bodyRight.y);
-	ctx.lineTo(buttRight.x, buttRight.y);
-	ctx.lineTo(tailMiddle.x, tailMiddle.y);
-	ctx.lineTo(buttLeft.x, buttLeft.y);
-	ctx.lineTo(bodyLeft.x, bodyLeft.y);
-	ctx.lineTo(headTop.x, headTop.y);
-	ctx.fill();
-	ctx.fillStyle = '#565b63';
-	ctx.beginPath();
-	ctx.moveTo(tailMiddle.x, tailMiddle.y);
-	ctx.lineTo(tailRight.x, tailRight.y);
-	ctx.lineTo(buttRight.x, buttRight.y);
-	ctx.lineTo(tailMiddle.x, tailMiddle.y);
-	ctx.fill();
-	ctx.moveTo(tailMiddle.x, tailMiddle.y);
-	ctx.lineTo(tailLeft.x, tailLeft.y);
-	ctx.lineTo(buttLeft.x, buttLeft.y);
-	ctx.lineTo(tailMiddle.x, tailMiddle.y);
-	ctx.fill();
-
-	/*ctx.strokeStyle = '#ff0000';
-	ctx.beginPath();
-	ctx.moveTo(this.position.x, this.position.y);
-	ctx.lineTo(this.position.x + dataX[1] / 10, this.position.y + dataY[1] / 10);
-	ctx.stroke();*/
-
-	/*ctx.beginPath();
-	ctx.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI, false);
-	ctx.fillStyle = '#20E020';
-	ctx.fill();*/
+	// drawing
+	this.DrawShape(ctx, [headTop, headRight, bodyRight, headTop, headLeft, bodyLeft], this.colors[0]);
+	this.DrawShape(ctx, [headTop, bodyRight, buttRight, tailMiddle, buttLeft, bodyLeft], this.colors[1]);
+	this.DrawShape(ctx, [tailMiddle, tailRight, buttRight, tailMiddle, tailLeft, buttLeft], this.colors[2]);
 };
 
 Fish.prototype.UpdatePosition = function(x, y) {
@@ -113,6 +67,16 @@ Fish.prototype.UpdatePosition = function(x, y) {
 	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, x, 0]);
 	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, y, 0]);
 	this.interpolationStart = Date.now();
+};
+
+Fish.prototype.DrawShape = function(ctx, points, color) {
+	ctx.fillStyle = color;
+	ctx.beginPath();
+	if (points.length != 0)
+		ctx.moveTo(points[0].x, points[0].y);
+	for (var i = 1; i < points.length; i++)
+		ctx.lineTo(points[i].x, points[i].y);
+	ctx.fill();
 };
 
 Fish.prototype.InterpolationTime = function() {
@@ -135,9 +99,9 @@ Interpolator = function(data) {
 };
 
 Interpolator.prototype.Eval= function(t) {
-	return [	this.coef[0]*t*t*t*t + this.coef[1]*t*t*t + this.coef[2]*t*t + this.coef[3]*t + this.coef[4], // positions
-				4*this.coef[0]*t*t*t + 3*this.coef[1]*t*t + 2*this.coef[2]*t + this.coef[3], // velocities
-				12*this.coef[0]*t*t + 6*this.coef[1]*t + 2*this.coef[2]]; // curvature
+	return [	(((this.coef[0]*t + this.coef[1])*t + this.coef[2])*t + this.coef[3])*t + this.coef[4], // positions
+				((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
+				(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
 
 };
 
