@@ -4,8 +4,8 @@ $(document).ready(function () {
 
 var App = {
 	INTERVAL : 20, 
-	CANVAS_WIDTH : 800, 
-	CANVAS_HEIGHT : 500,
+	CANVAS_WIDTH : 1000, 
+	CANVAS_HEIGHT : 700,
 	CANVAS_ID : "canvas"
 };
 
@@ -15,7 +15,7 @@ App.Start = function(){
 	
     App.Init();
 
-    fish = new Fish();
+    fish = new Fish(Math.random());
 
 	setTimeout("App.Run()", this.INTERVAL);
 };
@@ -40,7 +40,7 @@ App.MouseClick = function(x, y) {
 
 App.Run = function(){
 
-	ctx.fillStyle = "#DDDDDD";
+	ctx.fillStyle = "#b4cef7";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	//ctx.clearRect(0, 0, canvas.width, canvas.height);
 	fish.Draw(ctx);
