@@ -31,7 +31,7 @@ Fish.prototype.Draw = function(ctx) {
 		this.direction.copy(tmp).normalize();
 
 	var aTmp = new Vec2(dataX[1] - this.velocityOld.x, dataY[1] - this.velocityOld.y);
-	this.acceleration.scale(0.9).add(aTmp.scale(0.1));
+	this.acceleration.scale(0.9).add(aTmp.scale(0.08));
 	var aTangential = this.acceleration.dot(this.direction);
 	var aNormal = this.acceleration.dot(this.direction.ortho());
 	this.velocityOld.set(dataX[1], dataY[1]);

@@ -16,6 +16,7 @@ App.Start = function(){
     App.Init();
 
     fish = new Fish(Math.random());
+    lastUpdate = Date.now();
 
 	setTimeout("App.Run()", this.INTERVAL);
 };
@@ -26,7 +27,7 @@ App.Init = function(){
 
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 //	ctx.scale(1, -1);
-	canvas.addEventListener('click', function(e) {
+	canvas.addEventListener('mousemove', function(e) {
 		var rect = canvas.getBoundingClientRect();
     	var x = event.clientX - rect.left;
     	var y = event.clientY - rect.top;
@@ -35,7 +36,11 @@ App.Init = function(){
 };
 
 App.MouseClick = function(x, y) {
-	fish.UpdatePosition(x, y);
+	var now = Date.now();
+	if (now - lastUpdate > 200) {
+		fish.UpdatePosition(x, y);
+		lastUpdate = now;
+	}
 };
 
 App.Run = function(){
