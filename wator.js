@@ -24,11 +24,11 @@ App.Start = function(){
 
 	sharks = [];
 	for(var i = 0; i < this.NSHARK; i++){
-	sharks.push(new Shark(Math.random(),Pos[i]));
+		sharks.push(new Shark(Math.random(),Pos[i]));
 	}
 	fishes = [];
 	for(var i = this.NSHARK; i < this.NSHARK + this.NFISH; i++){
-	fishes.push(new Fish(Math.random(),Pos[i]));
+		fishes.push(new Fish(Math.random(),Pos[i]));
 	}
 
 	lastUpdate = Date.now();
