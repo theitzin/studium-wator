@@ -1,15 +1,18 @@
-Fish = function(seed) {
-	this.position = new Vec2(100, 100);
+Fish = function(seed,pos) {
+
+	if(pos.x < 0) pos.x += App.CANVAS_WIDTH;
+	if(pos.y < 0) pos.y += App.CANVAS_HEIGHT;
+	this.position = new Vec2(pos.x % App.CANVAS_WIDTH, pos.y % App.CANVAS_HEIGHT);
 	this.velocity = new Vec2(0, 0);
 	this.acceleration = new Vec2(0, 0);
 	this.direction = new Vec2(Math.cos(seed*2*Math.PI), Math.sin(seed*2*Math.PI));
-	
+
 	this.interpolatorX = new Interpolator([this.position.x, 0, 0, this.position.x, 0]);
 	this.interpolatorY = new Interpolator([this.position.y, 0, 0, this.position.y, 0]);
 	this.interpolationStart = Date.now();
 
-	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
-	this.colors = ['#9097a0', '#70757c', '#565b63'];
+	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
+	this.colors = ['#7fb7b8', '#1e8587', '#065456'];
 	this.animationtime = Math.random();
 };
 
@@ -18,8 +21,10 @@ Fish.prototype.Draw = function(ctx) {
 	// movement data processing
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
+	if(dataX[0] < 0) dataX[0] += App.CANVAS_WIDTH;
+	if(dataY[0] < 0) dataY[0] += App.CANVAS_HEIGHT;
+	this.position.set(dataX[0] % App.CANVAS_WIDTH, dataY[0] % App.CANVAS_HEIGHT);
 
-	this.position.set(dataX[0], dataY[0]);
 	var tmp = new Vec2(dataX[1], dataY[1]);
 	if (tmp.length2() > 1)
 		this.direction.copy(tmp).normalize();
@@ -69,6 +74,15 @@ Fish.prototype.UpdatePosition = function(x, y) {
 	this.interpolationStart = Date.now();
 };
 
+Fish.prototype.isNeighbour = function(coords) {
+	if(abs(abs(this.position.x-coords.x)-App.CELL) < 1 && abs(abs(this.position.y-coords.y)-App.CELL) < 1){
+		return true;
+	}
+	else {
+		return false;
+	}
+};
+
 Fish.prototype.DrawShape = function(ctx, points, color) {
 	ctx.fillStyle = color;
 	ctx.beginPath();
@@ -89,19 +103,19 @@ Fish.prototype.InterpolationTime = function() {
 
 Interpolator = function(data) {
 
-	var inverse = [	[3, 2, 1/2, -3, 1], 
-					[-4, -3, -1, 4, -1], 
-					[0, 0, 1/2, 0, 0], 
-					[0, 1, 0, 0, 0], 
-					[1, 0, 0, 0, 0]];
+	var inverse = [	[3, 2, 1/2, -3, 1],
+			[-4, -3, -1, 4, -1],
+			[0, 0, 1/2, 0, 0],
+			[0, 1, 0, 0, 0],
+			[1, 0, 0, 0, 0]];
 
 	this.coef = MatrixVectorMult(inverse, data);
 };
 
 Interpolator.prototype.Eval= function(t) {
-	return [	(((this.coef[0]*t + this.coef[1])*t + this.coef[2])*t + this.coef[3])*t + this.coef[4], // positions
-				((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
-				(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
+	return [(((this.coef[0]*t + this.coef[1])*t + this.coef[2])*t + this.coef[3])*t + this.coef[4], // positions
+		((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
+		(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
 
 };
 
