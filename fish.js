@@ -1,4 +1,4 @@
-Fish = function(seed,pos) {
+Entity = function(seed, pos) {
 
 	if(pos.x < 0) pos.x += App.CANVAS_WIDTH;
 	if(pos.y < 0) pos.y += App.CANVAS_HEIGHT;
@@ -11,12 +11,15 @@ Fish = function(seed,pos) {
 	this.interpolatorY = new Interpolator([this.position.y, 0, 0, this.position.y, 0]);
 	this.interpolationStart = Date.now();
 
+	this.animationTime = seed;
+
+	// default values, child classes fish and shark implement their own
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
 	this.colors = ['#7fb7b8', '#1e8587', '#065456'];
-	this.animationtime = seed;
+	this.animationSpeed = 0.1;
 };
 
-Fish.prototype.Draw = function(ctx) {
+Entity.prototype.Draw = function(ctx) {
 
 	// movement data processing
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
@@ -35,13 +38,13 @@ Fish.prototype.Draw = function(ctx) {
 	var aNormal = this.acceleration.dot(this.direction.ortho());
 	this.velocity.set(dataX[1], dataY[1]);
 
-	this.animationtime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 20, 0.5);
+	this.animationTime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 20, 0.5);
 	var scaledBodyLength = this.dimensions[1] - Math.abs(aNormal / 2);
 
 	// anchor points
-	var head = this.direction.clone().rotate(-Math.sin(this.animationtime) / 8 + aNormal / 40);
-	var butt = this.direction.clone().scale(-1).rotate(Math.sin(this.animationtime) / 4);
-	var tail = this.direction.clone().scale(-1).rotate(-Math.cos(this.animationtime) / 3);
+	var head = this.direction.clone().rotate(-Math.sin(this.animationTime) / 8 + aNormal / 40);
+	var butt = this.direction.clone().scale(-1).rotate(Math.sin(this.animationTime) / 4);
+	var tail = this.direction.clone().scale(-1).rotate(-Math.cos(this.animationTime) / 3);
 
 	// body points
 	var headTop = this.position.clone().addScaled(this.direction, scaledBodyLength).addScaled(head, this.dimensions[0]);
@@ -61,7 +64,7 @@ Fish.prototype.Draw = function(ctx) {
 	this.DrawShape(ctx, [tailMiddle, tailRight, buttRight, tailMiddle, tailLeft, buttLeft], this.colors[2]);
 };
 
-Fish.prototype.UpdatePosition = function(x, y) {
+Entity.prototype.UpdatePosition = function(x, y) {
 
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
@@ -74,7 +77,7 @@ Fish.prototype.UpdatePosition = function(x, y) {
 	this.interpolationStart = Date.now();
 };
 
-Fish.prototype.isNeighbour = function(coords) {
+Entity.prototype.isNeighbour = function(coords) {
 	if(abs(abs(this.position.x-coords.x)-App.CELL) < 1 && abs(abs(this.position.y-coords.y)-App.CELL) < 1){
 		return true;
 	}
@@ -83,7 +86,7 @@ Fish.prototype.isNeighbour = function(coords) {
 	}
 };
 
-Fish.prototype.DrawShape = function(ctx, points, color) {
+Entity.prototype.DrawShape = function(ctx, points, color) {
 	ctx.fillStyle = color;
 	ctx.beginPath();
 	if (points.length != 0)
@@ -93,21 +96,43 @@ Fish.prototype.DrawShape = function(ctx, points, color) {
 	ctx.fill();
 };
 
-Fish.prototype.InterpolationTime = function() {
+Entity.prototype.InterpolationTime = function() {
 	var dt = Math.min(Math.max(Date.now() - this.interpolationStart, 0) / 2000, 1);
 	return 1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
 };
 
+// child classes fish and shark
 
-// cubic interpolation for smooth movement
+Fish = function(seed, pos) {
+	Entity.apply(this, arguments);
+
+	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
+	this.colors = ['#7fb7b8', '#1e8587', '#065456'];
+	this.animationSpeed = 0.1;
+}
+Fish.prototype = Object.create(Entity.prototype);
+Fish.prototype.constructor = Fish;
+
+Shark = function(seed, pos) {
+	Entity.apply(this, arguments);
+
+	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
+	this.colors = ['#9097a0', '#70757c', '#565b63'];
+	this.animationSpeed = 0.1;
+}
+Shark.prototype = Object.create(Entity.prototype);
+Shark.prototype.constructor = Shark;
+
+
+// 5th order hermite interpolation for smooth movement
 
 Interpolator = function(data) {
 
 	var inverse = [	[3, 2, 1/2, -3, 1],
-			[-4, -3, -1, 4, -1],
-			[0, 0, 1/2, 0, 0],
-			[0, 1, 0, 0, 0],
-			[1, 0, 0, 0, 0]];
+					[-4, -3, -1, 4, -1],
+					[0, 0, 1/2, 0, 0],
+					[0, 1, 0, 0, 0],
+					[1, 0, 0, 0, 0]];
 
 	this.coef = MatrixVectorMult(inverse, data);
 };
