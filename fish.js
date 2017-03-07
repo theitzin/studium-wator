@@ -127,7 +127,7 @@ Fish = function(seed, pos) {
 	Entity.apply(this, arguments);
 
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
-	this.colors = ['#7fb7b8', '#1e8587', '#065456'];
+	this.colors = [HSVtoRGB(seed, 0.7, 0.8), HSVtoRGB(seed, 0.7, 0.6), HSVtoRGB(seed, 0.7, 0.3)];
 	this.animationSpeed = 0.1;
 }
 Fish.prototype = Object.create(Entity.prototype);
@@ -182,4 +182,27 @@ function MatrixVectorMult(mat, vec) {
 
 Number.prototype.mod = function(n) {
     return ((this % n) + n) % n;
+}
+
+// hsv to rgb string
+
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return 	'rgb(' + Math.round(r * 255) + ',' + Math.round(g * 255) + ',' + Math.round(b * 255) + ')';
 }
