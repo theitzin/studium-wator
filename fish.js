@@ -3,14 +3,14 @@ Fish = function(seed) {
 	this.velocity = new Vec2(0, 0);
 	this.acceleration = new Vec2(0, 0);
 	this.direction = new Vec2(Math.cos(seed*2*Math.PI), Math.sin(seed*2*Math.PI));
-	
+
 	this.interpolatorX = new Interpolator([this.position.x, 0, 0, this.position.x, 0]);
 	this.interpolatorY = new Interpolator([this.position.y, 0, 0, this.position.y, 0]);
 	this.interpolationStart = Date.now();
 
 	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
-	this.animationtime = Math.random();
+	this.animationtime = seed;
 };
 
 Fish.prototype.Draw = function(ctx) {

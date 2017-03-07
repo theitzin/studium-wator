@@ -129,11 +129,7 @@ Vec2.prototype.addScaled = function(a, s) {
 };
 
 Vec2.prototype.direction = function() {
-  var rad = Math.atan2(this.y, this.x);
-  var deg = rad * 180 / Math.PI;
-  if (deg < 0) deg = 360 + deg;
-
-  return deg;
+  return Math.atan2(this.y, this.x);
 };
 
 Vec2.prototype.length = function() {
