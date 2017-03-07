@@ -1,14 +1,12 @@
 Entity = function(seed, pos) {
 
-	if(pos.x < 0) pos.x += App.CANVAS_WIDTH;
-	if(pos.y < 0) pos.y += App.CANVAS_HEIGHT;
-	this.position = new Vec2(pos.x % App.CANVAS_WIDTH, pos.y % App.CANVAS_HEIGHT);
+	this.position = new Vec2(pos.x, pos.y);
 	this.velocity = new Vec2(0, 0);
 	this.acceleration = new Vec2(0, 0);
 	this.direction = new Vec2(Math.cos(seed*2*Math.PI), Math.sin(seed*2*Math.PI));
 
-	this.interpolatorX = new Interpolator([this.position.x, 0, 0, this.position.x, 0]);
-	this.interpolatorY = new Interpolator([this.position.y, 0, 0, this.position.y, 0]);
+	this.interpolatorX = new Interpolator([this.position.x, this.direction.x, 0, this.position.x + this.direction.x, 0]);
+	this.interpolatorY = new Interpolator([this.position.y, this.direction.y, 0, this.position.y + this.direction.y, 0]);
 	this.interpolationStart = Date.now();
 
 	this.animationTime = seed;
@@ -24,9 +22,8 @@ Entity.prototype.Draw = function(ctx) {
 	// movement data processing
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
-	if(dataX[0] < 0) dataX[0] += App.CANVAS_WIDTH;
-	if(dataY[0] < 0) dataY[0] += App.CANVAS_HEIGHT;
-	this.position.set(dataX[0] % App.CANVAS_WIDTH, dataY[0] % App.CANVAS_HEIGHT);
+
+	this.position.set(dataX[0], dataY[0]);
 
 	var tmp = new Vec2(dataX[1], dataY[1]);
 	if (tmp.length2() > 1)
@@ -59,11 +56,16 @@ Entity.prototype.Draw = function(ctx) {
 	var tailMiddle = this.position.clone().addScaled(butt, this.dimensions[4]).addScaled(tail, this.dimensions[6] / 2);
 
 	// drawing
+	var torusPosition = this.GetTorusPosition();
+	ctx.save();
+	ctx.translate(-(this.position.x - torusPosition.x), -(this.position.y - torusPosition.y));
 	this.DrawShape(ctx, [headTop, headRight, bodyRight, headTop, headLeft, bodyLeft], this.colors[0]);
 	this.DrawShape(ctx, [headTop, bodyRight, buttRight, tailMiddle, buttLeft, bodyLeft], this.colors[1]);
 	this.DrawShape(ctx, [tailMiddle, tailRight, buttRight, tailMiddle, tailLeft, buttLeft], this.colors[2]);
+	ctx.restore();
 };
 
+// now a relative position update!
 Entity.prototype.UpdatePosition = function(x, y) {
 
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
@@ -72,10 +74,28 @@ Entity.prototype.UpdatePosition = function(x, y) {
 	var acc = new Vec2(-dataX[2], -dataY[2]);
 	acc.normalize().scale(100);
 
-	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, x, 0]);
-	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, y, 0]);
+	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, dataX[0] + x, 0]);
+	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, dataY[0] + y, 0]);
 	this.interpolationStart = Date.now();
 };
+
+Entity.prototype.GetTorusPosition = function() { 
+	return new Vec2(this.position.x % App.CANVAS_WIDTH, this.position.y % App.CANVAS_HEIGHT);
+};
+
+// gives distance between fish or shark while taking torus topology into account
+Entity.prototype.DistanceTo = function(entity) {
+	var p = GetTorusPosition();
+	var ep = entity.GetTorusPosition();
+
+	return Math.min(p.distance(ep), 
+					p.distance(ep.addXY(App.CANVAS_WIDTH, 0)), 
+					p.distance(ep.addXY(-2*App.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(App.CANVAS_WIDTH, App.CANVAS_HEIGHT)),
+					p.distance(ep.addXY(0, -2*App.CANVAS_HEIGHT)));
+};
+
+// maybe update to this ^^^^^^ distance function?
 
 Entity.prototype.isNeighbour = function(coords) {
 	if(abs(abs(this.position.x-coords.x)-App.CELL) < 1 && abs(abs(this.position.y-coords.y)-App.CELL) < 1){
@@ -98,7 +118,7 @@ Entity.prototype.DrawShape = function(ctx, points, color) {
 
 Entity.prototype.InterpolationTime = function() {
 	var dt = Math.min(Math.max(Date.now() - this.interpolationStart, 0) / 2000, 1);
-	return 1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
+	return dt; //1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
 };
 
 // child classes fish and shark
@@ -139,8 +159,8 @@ Interpolator = function(data) {
 
 Interpolator.prototype.Eval= function(t) {
 	return [(((this.coef[0]*t + this.coef[1])*t + this.coef[2])*t + this.coef[3])*t + this.coef[4], // positions
-		((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
-		(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
+			((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
+			(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
 
 };
 

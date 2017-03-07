@@ -16,11 +16,11 @@ var App = {
 
 App.Start = function(){
 	canvas = document.getElementById(this.CANVAS_ID);
-    	ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d');
 
   	App.Init();
 
-	Pos = App.getRandPos();
+	Pos = App.GetRandPos();
 
 	sharks = [];
 	for(var i = 0; i < this.NSHARK; i++){
@@ -47,16 +47,16 @@ App.Init = function(){
 		var rect = canvas.getBoundingClientRect();
     	var x = event.clientX - rect.left;
     	var y = event.clientY - rect.top;
-		App.MouseClick(x, y);
+		App.MouseMove(x, y);
 	});
   */
 };
 
-App.MouseClick = function(x, y) {
+App.MouseMove = function(x, y) {
 	var now = Date.now();
 	if (now - lastUpdate > 200) {
 		fish.UpdatePosition(x, y);
-  	fish2.UpdatePosition(x+1, y+1);
+  		fish2.UpdatePosition(x+1, y+1);
 		lastUpdate = now;
 	}
 };
@@ -74,8 +74,8 @@ App.Run = function(){
 		sharks[i].Draw(ctx);
 	}
 	var now = Date.now();
-	if (now - lastUpdate > 300) {
-		App.fishSwim(fishes,sharks);
+	if (now - lastUpdate > 1000) {
+		App.FishSwim(fishes,sharks);
 		lastUpdate = now;
 	}
 
@@ -83,15 +83,17 @@ App.Run = function(){
 };
 
 
-App.fishSwim = function(f,s){
+App.FishSwim = function(f,s){
 	for(var i = 0; i < f.length; i++){
-		var moveX = (Math.round(Math.random())*2-1)*this.CELL;
-		var moveY = (Math.round(Math.random())*2-1)*this.CELL;
-		f[i].UpdatePosition(f[i].position.x+moveX,f[i].position.y+moveY)
+
+		var direction = f[i].direction;
+		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+		f[i].UpdatePosition(moveX, moveY)
 	}
 }
 // utility stuff
-App.getRandPos = function(){
+App.GetRandPos = function(){
 	r = [];
 	while(r.length < this.NSHARK+this.NFISH){
 		var trig = false;
