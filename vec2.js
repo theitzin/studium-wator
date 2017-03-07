@@ -64,6 +64,18 @@ Vec2.prototype.sub = function(v) {
   return this;
 };
 
+Vec2.prototype.addXY = function(x, y) {
+  this.x += x;
+  this.y += y;
+  return this;
+};
+
+Vec2.prototype.subXY = function(x, y) {
+  this.x -= x;
+  this.y -= y;
+  return this;
+};
+
 Vec2.prototype.scale = function(f) {
   this.x *= f;
   this.y *= f;
@@ -80,12 +92,6 @@ Vec2.prototype.squareDistance = function(v) {
   var dx = v.x - this.x;
   var dy = v.y - this.y;
   return dx * dx + dy * dy;
-};
- 
-Vec2.prototype.simpleDistance = function(v) {
-  var dx = Math.abs(v.x - this.x);
-  var dy = Math.abs(v.y - this.y);
-  return Math.min(dx, dy);
 };
 
 Vec2.prototype.copy = function(v) {
@@ -129,11 +135,7 @@ Vec2.prototype.addScaled = function(a, s) {
 };
 
 Vec2.prototype.direction = function() {
-  var rad = Math.atan2(this.y, this.x);
-  var deg = rad * 180 / Math.PI;
-  if (deg < 0) deg = 360 + deg;
-
-  return deg;
+  return Math.atan2(this.y, this.x);
 };
 
 Vec2.prototype.length = function() {
