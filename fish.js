@@ -80,7 +80,7 @@ Entity.prototype.UpdatePosition = function(x, y) {
 };
 
 Entity.prototype.GetTorusPosition = function() { 
-	return new Vec2(this.position.x % App.CANVAS_WIDTH, this.position.y % App.CANVAS_HEIGHT);
+	return new Vec2(this.position.x.mod(App.CANVAS_WIDTH), this.position.y.mod(App.CANVAS_HEIGHT));
 };
 
 // gives distance between fish or shark while taking torus topology into account
@@ -176,4 +176,10 @@ function MatrixVectorMult(mat, vec) {
 		result.push(tmp);
 	}
 	return result;
+}
+
+// javascript % operator is bullshit - returns crap for negative numbers
+
+Number.prototype.mod = function(n) {
+    return ((this % n) + n) % n;
 }
