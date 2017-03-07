@@ -1,29 +1,29 @@
-Fish = function(seed,pos) {
+Entity = function(seed, pos) {
 
-	if(pos.x < 0) pos.x += App.CANVAS_WIDTH;
-	if(pos.y < 0) pos.y += App.CANVAS_HEIGHT;
-	this.position = new Vec2(pos.x % App.CANVAS_WIDTH, pos.y % App.CANVAS_HEIGHT);
+	this.position = new Vec2(pos.x, pos.y);
 	this.velocity = new Vec2(0, 0);
 	this.acceleration = new Vec2(0, 0);
 	this.direction = new Vec2(Math.cos(seed*2*Math.PI), Math.sin(seed*2*Math.PI));
 
-	this.interpolatorX = new Interpolator([this.position.x, 0, 0, this.position.x, 0]);
-	this.interpolatorY = new Interpolator([this.position.y, 0, 0, this.position.y, 0]);
+	this.interpolatorX = new Interpolator([this.position.x, this.direction.x, 0, this.position.x + this.direction.x, 0]);
+	this.interpolatorY = new Interpolator([this.position.y, this.direction.y, 0, this.position.y + this.direction.y, 0]);
 	this.interpolationStart = Date.now();
 
+	this.animationTime = seed;
+
+	// default values, child classes fish and shark implement their own
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
 	this.colors = ['#7fb7b8', '#1e8587', '#065456'];
-	this.animationtime = Math.random();
+	this.animationSpeed = 0.1;
 };
 
-Fish.prototype.Draw = function(ctx) {
+Entity.prototype.Draw = function(ctx) {
 
 	// movement data processing
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
-	if(dataX[0] < 0) dataX[0] += App.CANVAS_WIDTH;
-	if(dataY[0] < 0) dataY[0] += App.CANVAS_HEIGHT;
-	this.position.set(dataX[0] % App.CANVAS_WIDTH, dataY[0] % App.CANVAS_HEIGHT);
+
+	this.position.set(dataX[0].mod(App.CANVAS_WIDTH), dataY[0].mod(App.CANVAS_HEIGHT));
 
 	var tmp = new Vec2(dataX[1], dataY[1]);
 	if (tmp.length2() > 1)
@@ -35,13 +35,13 @@ Fish.prototype.Draw = function(ctx) {
 	var aNormal = this.acceleration.dot(this.direction.ortho());
 	this.velocity.set(dataX[1], dataY[1]);
 
-	this.animationtime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 20, 0.5);
+	this.animationTime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 20, 0.5);
 	var scaledBodyLength = this.dimensions[1] - Math.abs(aNormal / 2);
 
 	// anchor points
-	var head = this.direction.clone().rotate(-Math.sin(this.animationtime) / 8 + aNormal / 40);
-	var butt = this.direction.clone().scale(-1).rotate(Math.sin(this.animationtime) / 4);
-	var tail = this.direction.clone().scale(-1).rotate(-Math.cos(this.animationtime) / 3);
+	var head = this.direction.clone().rotate(-Math.sin(this.animationTime) / 8 + aNormal / 40);
+	var butt = this.direction.clone().scale(-1).rotate(Math.sin(this.animationTime) / 4);
+	var tail = this.direction.clone().scale(-1).rotate(-Math.cos(this.animationTime) / 3);
 
 	// body points
 	var headTop = this.position.clone().addScaled(this.direction, scaledBodyLength).addScaled(head, this.dimensions[0]);
@@ -56,12 +56,17 @@ Fish.prototype.Draw = function(ctx) {
 	var tailMiddle = this.position.clone().addScaled(butt, this.dimensions[4]).addScaled(tail, this.dimensions[6] / 2);
 
 	// drawing
+	var torusPosition = this.GetTorusPosition();
+	ctx.save();
+	ctx.translate(-(this.position.x - torusPosition.x), -(this.position.y - torusPosition.y));
 	this.DrawShape(ctx, [headTop, headRight, bodyRight, headTop, headLeft, bodyLeft], this.colors[0]);
 	this.DrawShape(ctx, [headTop, bodyRight, buttRight, tailMiddle, buttLeft, bodyLeft], this.colors[1]);
 	this.DrawShape(ctx, [tailMiddle, tailRight, buttRight, tailMiddle, tailLeft, buttLeft], this.colors[2]);
+	ctx.restore();
 };
 
-Fish.prototype.UpdatePosition = function(x, y) {
+// now a relative position update!
+Entity.prototype.UpdatePosition = function(x, y) {
 
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
@@ -69,12 +74,30 @@ Fish.prototype.UpdatePosition = function(x, y) {
 	var acc = new Vec2(-dataX[2], -dataY[2]);
 	acc.normalize().scale(100);
 
-	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, x, 0]);
-	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, y, 0]);
+	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, dataX[0] + x, 0]);
+	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, dataY[0] + y, 0]);
 	this.interpolationStart = Date.now();
 };
 
-Fish.prototype.isNeighbour = function(coords) {
+Entity.prototype.GetTorusPosition = function() {
+	return new Vec2(this.position.x.mod(App.CANVAS_WIDTH), this.position.y.mod(App.CANVAS_HEIGHT));
+};
+
+// gives distance between fish or shark while taking torus topology into account
+Entity.prototype.DistanceTo = function(entity) {
+	var p = this.GetTorusPosition();
+	var ep = entity.GetTorusPosition();
+
+	return Math.min(p.distance(ep),
+					p.distance(ep.addXY(App.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(-2*App.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(App.CANVAS_WIDTH, App.CANVAS_HEIGHT)),
+					p.distance(ep.addXY(0, -2*App.CANVAS_HEIGHT)));
+};
+
+// maybe update to this ^^^^^^ distance function?
+
+Entity.prototype.isNeighbour = function(coords) {
 	if(abs(abs(this.position.x-coords.x)-App.CELL) < 1 && abs(abs(this.position.y-coords.y)-App.CELL) < 1){
 		return true;
 	}
@@ -83,7 +106,7 @@ Fish.prototype.isNeighbour = function(coords) {
 	}
 };
 
-Fish.prototype.DrawShape = function(ctx, points, color) {
+Entity.prototype.DrawShape = function(ctx, points, color) {
 	ctx.fillStyle = color;
 	ctx.beginPath();
 	if (points.length != 0)
@@ -93,29 +116,56 @@ Fish.prototype.DrawShape = function(ctx, points, color) {
 	ctx.fill();
 };
 
-Fish.prototype.InterpolationTime = function() {
+Entity.prototype.InterpolationTime = function() {
 	var dt = Math.min(Math.max(Date.now() - this.interpolationStart, 0) / 2000, 1);
-	return 1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
+	return dt; //1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
 };
 
+// child classes fish and shark
 
-// cubic interpolation for smooth movement
+Fish = function(seed, pos) {
+	Entity.apply(this, arguments);
+
+	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
+	this.colors = [HSVtoRGB(seed, 0.7, 0.8), HSVtoRGB(seed, 0.7, 0.6), HSVtoRGB(seed, 0.7, 0.3)];
+	this.animationSpeed = 0.1;
+
+	this.spawn = App.FISHSPAWN;
+}
+Fish.prototype = Object.create(Entity.prototype);
+Fish.prototype.constructor = Fish;
+
+Shark = function(seed, pos) {
+	Entity.apply(this, arguments);
+
+	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
+	this.colors = ['#9097a0', '#70757c', '#565b63'];
+	this.animationSpeed = 0.1;
+
+	this.spawn = App.SHARKSPAWN;
+	this.starving = App.SHARKSTARVE;
+}
+Shark.prototype = Object.create(Entity.prototype);
+Shark.prototype.constructor = Shark;
+
+
+// 5th order hermite interpolation for smooth movement
 
 Interpolator = function(data) {
 
 	var inverse = [	[3, 2, 1/2, -3, 1],
-			[-4, -3, -1, 4, -1],
-			[0, 0, 1/2, 0, 0],
-			[0, 1, 0, 0, 0],
-			[1, 0, 0, 0, 0]];
+					[-4, -3, -1, 4, -1],
+					[0, 0, 1/2, 0, 0],
+					[0, 1, 0, 0, 0],
+					[1, 0, 0, 0, 0]];
 
 	this.coef = MatrixVectorMult(inverse, data);
 };
 
 Interpolator.prototype.Eval= function(t) {
 	return [(((this.coef[0]*t + this.coef[1])*t + this.coef[2])*t + this.coef[3])*t + this.coef[4], // positions
-		((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
-		(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
+			((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
+			(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
 
 };
 
@@ -131,4 +181,33 @@ function MatrixVectorMult(mat, vec) {
 		result.push(tmp);
 	}
 	return result;
+}
+
+// javascript % operator is bullshit - returns crap for negative numbers
+
+Number.prototype.mod = function(n) {
+    return ((this % n) + n) % n;
+}
+
+// hsv to rgb string
+
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return 	'rgb(' + Math.round(r * 255) + ',' + Math.round(g * 255) + ',' + Math.round(b * 255) + ')';
 }
