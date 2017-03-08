@@ -41,15 +41,6 @@ App.Init = function(){
 	ctx.canvas.height = this.CANVAS_HEIGHT;
 
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
-//	ctx.scale(1, -1);
-/*
-	canvas.addEventListener('mousemove', function(e) {
-		var rect = canvas.getBoundingClientRect();
-    	var x = event.clientX - rect.left;
-    	var y = event.clientY - rect.top;
-		App.MouseMove(x, y);
-	});
-  */
 };
 
 App.MouseMove = function(x, y) {
@@ -81,7 +72,6 @@ App.Run = function(){
 
  	setTimeout("App.Run()", this.INTERVAL);
 };
-
 
 App.FishSwim = function(f,s){
 	for(var i = 0; i < f.length; i++){
