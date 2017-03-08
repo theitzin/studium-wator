@@ -127,7 +127,10 @@ Fish = function(seed, pos) {
 	Entity.apply(this, arguments);
 
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
-	this.colors = [HSVtoRGB(seed, 0.7, 0.8), HSVtoRGB(seed, 0.7, 0.6), HSVtoRGB(seed, 0.7, 0.3)];
+	var colorRange = [0.4, 0.6];
+	this.colors = [	HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.5, 0.8), 
+					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.6), 
+					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.5)];
 	this.animationSpeed = 0.1;
 
 	this.spawn = App.FISHSPAWN;
