@@ -85,11 +85,12 @@ Entity.prototype.GetTorusPosition = function() {
 
 // gives distance between fish or shark while taking torus topology into account
 Entity.prototype.DistanceTo = function(entity) {
-	var p = GetTorusPosition();
+
+	var p = this.GetTorusPosition();
 	var ep = entity.GetTorusPosition();
 
-	return Math.min(p.distance(ep), 
-					p.distance(ep.addXY(App.CANVAS_WIDTH, 0)), 
+	return Math.min(p.distance(ep),
+					p.distance(ep.addXY(App.CANVAS_WIDTH, 0)),
 					p.distance(ep.addXY(-2*App.CANVAS_WIDTH, 0)),
 					p.distance(ep.addXY(App.CANVAS_WIDTH, App.CANVAS_HEIGHT)),
 					p.distance(ep.addXY(0, -2*App.CANVAS_HEIGHT)));
@@ -127,8 +128,13 @@ Fish = function(seed, pos) {
 	Entity.apply(this, arguments);
 
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
-	this.colors = [HSVtoRGB(seed, 0.7, 0.8), HSVtoRGB(seed, 0.7, 0.6), HSVtoRGB(seed, 0.7, 0.3)];
+	var colorRange = [0.4, 0.6];
+	this.colors = [	HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.5, 0.8), 
+					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.6), 
+					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.5)];
 	this.animationSpeed = 0.1;
+
+	this.spawn = App.FISHSPAWN;
 }
 Fish.prototype = Object.create(Entity.prototype);
 Fish.prototype.constructor = Fish;
@@ -139,6 +145,9 @@ Shark = function(seed, pos) {
 	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
+
+	this.spawn = App.SHARKSPAWN;
+	this.starving = App.SHARKSTARVE;
 }
 Shark.prototype = Object.create(Entity.prototype);
 Shark.prototype.constructor = Shark;

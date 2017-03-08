@@ -3,15 +3,20 @@ $(document).ready(function () {
 });
 
 var App = {
-	INTERVAL : 20,
-	CANVAS_WIDTH : 1100,
-	CANVAS_HEIGHT : 600,
-	CANVAS_ID : "canvas",
-  	CELL : 50,
-	XSTEP : 22,
-	YSTEP : 12,
-	NSHARK : 5,
-	NFISH : 40
+  	INTERVAL : 20,
+  	CANVAS_WIDTH : 1100,
+  	CANVAS_HEIGHT : 600,
+  	CANVAS_ID : "canvas",
+    CELL : 50,
+  	XSTEP : 22,
+  	YSTEP : 12,
+    TOL : 40,
+    TIMESTEP : 1000,
+  	NSHARK : 5,
+  	NFISH : 40,
+    SHARKSTARVE : 5,
+    SHARKSPAWN : 10,
+    FISHSPAWN : 10
 };
 
 App.Start = function(){
@@ -21,18 +26,17 @@ App.Start = function(){
   	App.Init();
 
 	Pos = App.GetRandPos();
-
+ 
 	sharks = [];
-	for(var i = 0; i < this.NSHARK; i++){
+	for(var i = 0; i < this.NSHARK; i++) {
 		sharks.push(new Shark(Math.random(),Pos[i]));
 	}
 	fishes = [];
-	for(var i = this.NSHARK; i < this.NSHARK + this.NFISH; i++){
+	for(var i = this.NSHARK; i < this.NSHARK + this.NFISH; i++) {
 		fishes.push(new Fish(Math.random(),Pos[i]));
 	}
 
 	lastUpdate = Date.now();
-
 	setTimeout("App.Run()", this.INTERVAL);
 };
 
@@ -43,6 +47,7 @@ App.Init = function(){
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
 
+/*
 App.MouseMove = function(x, y) {
 	var now = Date.now();
 	if (now - lastUpdate > 200) {
@@ -50,7 +55,7 @@ App.MouseMove = function(x, y) {
   		fish2.UpdatePosition(x+1, y+1);
 		lastUpdate = now;
 	}
-};
+};*/
 
 App.Run = function(){
 
@@ -58,15 +63,16 @@ App.Run = function(){
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	//ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	for(var i = 0; i < this.NFISH; i++){
+	for(var i = 0; i < fishes.length; i++){
 		fishes[i].Draw(ctx);
 	}
-	for(var i = 0; i < this.NSHARK; i++){
+	for(var i = 0; i < sharks.length; i++){
 		sharks[i].Draw(ctx);
 	}
 	var now = Date.now();
-	if (now - lastUpdate > 1000) {
+	if (now - lastUpdate > App.TIMESTEP) {
 		App.FishSwim(fishes,sharks);
+  		App.SharkSwim(fishes,sharks);
 		lastUpdate = now;
 	}
 
@@ -75,13 +81,70 @@ App.Run = function(){
 
 App.FishSwim = function(f,s){
 	for(var i = 0; i < f.length; i++){
-
 		var direction = f[i].direction;
 		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
 		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
-		f[i].UpdatePosition(moveX, moveY)
+
+	    if(f[i].spawn <= 0) {
+	    	f.push(new Fish(Math.random(),f[i].position));
+	    	f[i].spawn = App.FISHSPAWN;
+	    }
+    	else {
+      		f[i].spawn -= 1;
+    	}
+		f[i].UpdatePosition(moveX, moveY);
 	}
+};
+
+App.SharkSwim = function(f,s){
+  for(var i = 0; i < s.length; i++){
+    if(s[i].starving <= 0){
+      s.splice(i, 1);
+    }
+  }
+  for(var i = 0; i < s.length; i++){
+    var eatFish = null;
+    for(var j = 0; j < f.length; j++){
+      var dist = s[i].DistanceTo(f[j]);
+      if(dist < App.TOL){
+        eatFish = f[j];
+        break;
+      }
+    }
+    if(eatFish == null){
+		  var direction = s[i].direction;
+  		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+  		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+      s[i].starving -= 1;
+    }
+    else {
+      var dirX = eatFish.position.x - s[i].position.x;
+      var dirY = eatFish.position.y - s[i].position.y;
+      // when shark sees fish on other side
+      if(Math.abs(dirX) > App.TOL){
+        var moveX = dirX - Math.sign(dirX)*App.CANVAS_WIDTH;
+      } else {
+        var moveX = eatFish.position.x - s[i].position.x;
+      }
+      if(Math.abs(dirY) > App.TOL){
+        var moveY = dirY - Math.sign(dirY)*App.CANVAS_HEIGHT;
+      } else {
+        var moveY = eatFish.position.y - s[i].position.y;
+      }
+      s[i].starving = App.SHARKSTARVE;
+      f.splice(j, 1);
+    }
+    if(s[i].spawn <= 0){
+      s.push(new Shark(Math.random(),s[i].position));
+      s[i].spawn = App.SHARKSPAWN;
+    }
+    else {
+      s[i].spawn -= 1;
+    }
+    s[i].UpdatePosition(moveX,moveY)
+  }
 }
+
 // utility stuff
 App.GetRandPos = function(){
 	r = [];
