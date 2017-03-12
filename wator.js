@@ -4,18 +4,20 @@ $(document).ready(function () {
 
 var App = {
   	INTERVAL : 20,
-  	CANVAS_WIDTH : 1100,
+  	CANVAS_WIDTH : 1000,
   	CANVAS_HEIGHT : 600,
   	CANVAS_ID : "canvas",
     CELL : 50,
   	XSTEP : 22,
   	YSTEP : 12,
     TOL : 40,
-    TIMESTEP : 1000,
+    TIMESTEP : 500,
   	NSHARK : 5,
-  	NFISH : 40,
-    SHARKSTARVE : 5,
-    SHARKSPAWN : 10,
+  	NFISH : 100,
+    MAXFISH : 200,
+    MAXSHARK : 25,
+    SHARKSTARVE : 20,
+    SHARKSPAWN : 30,
     FISHSPAWN : 10
 };
 
@@ -41,10 +43,10 @@ App.Start = function(){
 };
 
 App.Init = function(){
-	ctx.canvas.width = this.CANVAS_WIDTH;
-	ctx.canvas.height = this.CANVAS_HEIGHT;
+  ctx.canvas.width = this.CANVAS_WIDTH;
+  ctx.canvas.height = this.CANVAS_HEIGHT;
 
-	ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
 //	ctx.scale(1, -1);
 };
 
@@ -64,6 +66,8 @@ App.Run = function(){
 	if (now - lastUpdate > App.TIMESTEP) {
 		App.FishSwim(fishes,sharks);
   	App.SharkSwim(fishes,sharks);
+    //updatePlot(fishes.length,sharks.length);
+    console.log(fishes.length,sharks.length)
 		lastUpdate = now;
 	}
 
@@ -72,18 +76,28 @@ App.Run = function(){
 
 
 App.FishSwim = function(f,s){
+  //console.log(f[0].direction);
 	for(var i = 0; i < f.length; i++){
 		var direction = f[i].direction;
 		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
 		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
-    if(f[i].spawn <= 0){
+    //f[i].UpdatePosition(moveX, moveY);
+    var move = f[i].nextPosition(f,s);
+
+    move.scale(100);
+    //console.log(move);
+    //move.x *= Math.round(Math.random())*2-1;
+    //move.y *= Math.round(Math.random())*2-1;
+
+    if(f[i].spawn <= 0 && f.length < App.MAXFISH){
       f.push(new Fish(Math.random(),f[i].position));
       f[i].spawn = App.FISHSPAWN;
     }
     else {
       f[i].spawn -= 1;
     }
-		f[i].UpdatePosition(moveX, moveY);
+    //f[i].UpdatePosition(moveX, moveY);
+		f[i].UpdatePosition(move.x, move.y);
 	}
 }
 
@@ -125,14 +139,14 @@ App.SharkSwim = function(f,s){
       s[i].starving = App.SHARKSTARVE;
       f.splice(j, 1);
     }
-    if(s[i].spawn <= 0){
+    if(s[i].spawn <= 0 && s.length < App.MAXSHARK){
       s.push(new Shark(Math.random(),s[i].position));
       s[i].spawn = App.SHARKSPAWN;
     }
     else {
       s[i].spawn -= 1;
     }
-    s[i].UpdatePosition(moveX,moveY)
+    s[i].UpdatePosition(moveX*0.5,moveY*0.5)
   }
 }
 
