@@ -5,7 +5,7 @@ $(document).ready(function () {
 var App = {
   	INTERVAL : 20,
   	CANVAS_WIDTH : 1000,
-  	CANVAS_HEIGHT : 600,
+  	CANVAS_HEIGHT : 1000,
   	CANVAS_ID : "canvas",
     CELL : 50,
   	XSTEP : 22,
