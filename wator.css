@@ -11,6 +11,27 @@ body {
 	overflow: hidden;
 }
 
+/*#documentation_link {
+	float: right;
+}*/
+
+#reset_button {
+	display: inline-block;
+}
+
+.collapsible-link {
+	text-decoration: none;
+}
+
+#footer_text {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	text-align: center;
+	font-size: 80%;
+	padding: 5px;
+}
+
 #canvas {
 	width: 100%;
 	height: 100%;
@@ -18,26 +39,31 @@ body {
 
 #canvas_container {
 	margin: 0px;
-	height: 70%;
-	width: 70vh;
+	height: 75%;
+	width: 75vh;
 }
 
 #controls_container {
-	float: right;
-	background-color: #eeeeee;
-	height: 70%;
-	width: calc(100% - 70vh);
+	overflow-x: hidden;
+	overflow-y: auto;
+	position: absolute;
+	right: 0px;
+	padding: 0px 10px 0px 10px;
+	/*background-color: #eeeeee;*/
+	height: 100%;
+	width: calc(100% - 75vh);
 }
 
 #graph_container {
-	float: right;
+	position: absolute;
+	bottom: 0px;
 	background-color: #cccccc;
-	height: 30%;
+	height: 25%;
 	clear: right;
-	width: 100%;
+	width: 75vh;
 }
 
-@media (min-aspect-ratio: 5/4) {
+@media (min-aspect-ratio: 4/3) {
 	#canvas_container {
 		margin: 0px;
 		height: 100%;
@@ -45,22 +71,19 @@ body {
 	}
 
 	#controls_container {
-		float: right;
-		background-color: #eeeeee;
-		height: 50%;
+		height: 75%;
 		width: calc(100% - 100vh);
 	}
 
 	#graph_container {
-		float: right;
-		background-color: #cccccc;
-		height: 50%;
+		right: 0px;
+		height: 25%;
 		clear: right;
 		width: calc(100% - 100vh);
 	}
 }
 
-@media (max-aspect-ratio: 4/5) {
+@media (max-aspect-ratio: 5/6) {
 	#canvas_container {
 		margin: 0px;
 		height: 100vw;
@@ -70,16 +93,11 @@ body {
 	#controls_container {
 		position: absolute;
 		bottom: 0px;
-		background-color: #eeeeee;
 		height: calc(100% - 100vw);
 		width: 50%;
 	}
 
 	#graph_container {
-		position: absolute;
-		bottom: 0px;
-		right: 0px;
-		background-color: #cccccc;
 		height: calc(100% - 100vw);
 		width: 50%;
 	}
