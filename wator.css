@@ -1,35 +1,5 @@
-html {
-	height: 100%;
-	width: 100%;
-}
-
 body {
-	position: relative;
-	height: 100%;
-	width: 100%;
-	margin: 0px;
-	overflow: hidden;
-}
-
-/*#documentation_link {
-	float: right;
-}*/
-
-#reset_button {
-	display: inline-block;
-}
-
-.collapsible-link {
-	text-decoration: none;
-}
-
-#footer_text {
-	position: absolute;
-	bottom: 0px;
-	width: 100%;
-	text-align: center;
-	font-size: 80%;
-	padding: 5px;
+	background-color: #e8e8e8;
 }
 
 #canvas {
@@ -37,19 +7,57 @@ body {
 	height: 100%;
 }
 
-#canvas_container {
-	margin: 0px;
-	height: 75%;
-	width: 75vh;
+.container_wrapper {
+	background-color: white;
+	margin: 8px -7px 0px -7px;
+	padding: 10px 15px 15px 15px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
+#container_canvas {
+	padding: 0px;
+}
+
+#container_about {
+
+}
+
+#container_controls {
+
+}
+
+#container_graph {
+
+}
+
+#container_end {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-bottom: 3px;
+}
+
+#documentation_link {
+	display: block;
+	text-align: right;
+}
+
+#reset_button {
+	display: inline-block;
+}
+
+#footer_text {
+	text-align: center;
+	font-size: 90%;
+	font-weight: bold;
+}
+
+/*
 #controls_container {
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: absolute;
 	right: 0px;
 	padding: 0px 10px 0px 10px;
-	/*background-color: #eeeeee;*/
 	height: 100%;
 	width: calc(100% - 75vh);
 }
@@ -62,7 +70,8 @@ body {
 	clear: right;
 	width: 75vh;
 }
-
+*/
+/*
 @media (min-aspect-ratio: 4/3) {
 	#canvas_container {
 		margin: 0px;
@@ -101,4 +110,4 @@ body {
 		height: calc(100% - 100vw);
 		width: 50%;
 	}
-}
+}*/

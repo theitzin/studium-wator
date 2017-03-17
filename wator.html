@@ -1,85 +1,77 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <html>
-   <head>
-       <meta charset="utf-8" />
-    	<title>Wator</title>
-        <link rel="stylesheet" type="text/css" href="wator.css">
-    	  <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-      	<script type="text/javascript" src="wator.js"></script>
-      	<script type="text/javascript" src="fish.js"></script>
-      	<script type="text/javascript" src="vec2.js"></script>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <head>
+    <meta charset="utf-8" />
+    <title>Wator</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap-xlgrid.min.css">      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+      <link rel="stylesheet" type="text/css" href="wator.css">
+    	<script type="text/javascript" src="wator.js"></script>
+    	<script type="text/javascript" src="fish.js"></script>
+    	<script type="text/javascript" src="vec2.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
 
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-   </head>
-   <body>
-      <div id="controls_container">
-        <h2>Information</h2>
-        
-        <div class="panel-group">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" href="#collapsible_about"><div class="collapsible-link">About Wator</div></a>
-              </h4>
-            </div>
-            <div id="collapsible_about" class="panel-collapse collapse in">
-              <div class="panel-body">
-                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-              </div>
-              <div class="panel-footer">
-                <a id="documentation_link" href="url">Documentation</a>
-              </div>
-            </div>
-          </div>
+        <div id="container_canvas" class="col-sm-12 col-md-12 col-lg-8 col-xl-8">
+          <canvas id="canvas"></canvas>
         </div>
-        <div class="panel-group">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" href="#collapsible_controls"><div class="collapsible-link">Controls</div></a>
-              </h4>
-            </div>
-            <div id="collapsible_controls" class="panel-collapse collapse in">
-              <div class="panel-body">
-                <h4>Simulation mode</h4>
-                <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-primary active">
-                    <input type="radio" name="mode" id="mode1" autocomplete="off" checked> Continuous Wator
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="radio" name="mode" id="mode2" autocomplete="off"> Classic Wator
-                  </label>
-                  <label class="btn btn-primary">
-                    <input type="radio" name="mode" id="mode3" autocomplete="off"> Tetris
-                  </label>
-                </div>
-                <button id="reset_button" type="button" class="btn btn-primary">Reset</button>
-              </div>
-              <div class="panel-footer">
-              </div>
-            </div>
+
+        <div id="container_about" class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
+          <div class="container_wrapper">
+            <h4>About Wator</h4>
+
+            <p>
+            The balance of this ecosystem is very delicate: the populations of two species can follow hugely different cycles depending on the given parameters (such as reproduction cycles and the time period in which a shark must eat to avoid starvation) as well as starting positions of each being. We may go from both species being endangered to an abundance of one or both.
+            <br><br>
+            When the prey are numerous, predators can reproduce rapidly. But this increase in turn increases the number of prey hunted and the population of the prey decreases. By becoming rarer prey, predators begin to starve and die of starvation, decreasing their population and easing the pressure on hunting prey. The prey (and in time predator) can then go back to rapidly reproducing as the cycle repeats itself.
+            <br><br>
+            Time passes in discrete jumps, which I shall call chronons. During each chronon a fish or shark may move north, east, south or west to an adjacent point, provided the point is not already occupied by a member of its own species. A random-number generator makes the actual choice. For a fish the choice is simple: select one unoccupied adjacent point at random and move there. If all four adjacent points are occupied, the fish does not move. Since hunting for fish takes priority over mere movement, the rules for a shark are more complicated: from the adjacent points occupied by fish, select one at random, move there and devour the fish. If no fish are in the neighborhood, the shark moves just as a fish does, avoiding its fellow sharks.
+            </p>
+            
+            <a id="documentation_link" href="url">Documentation</a>
           </div>
         </div>
 
-        <div id="footer_text" class="text-muted">Overengineered by Sebastian von der Thannen and Thomas Heitzinger 2017</div>
+        <div id="container_controls" class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div class="container_wrapper">
+            <h4>Controls</h4>
 
-      </div>
-      <div id="graph_container">
-        graph
-        <span id="graph" width="400" height="400"></span>
-      </div>
-      <div id=canvas_container>
-        <canvas id="canvas"></canvas>
-      </div>
-   </body>
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-primary active">
+                <input type="radio" name="mode" id="mode1" autocomplete="off" checked> Continuous Wator
+              </label>
+              <label class="btn btn-primary">
+                <input type="radio" name="mode" id="mode2" autocomplete="off"> Classic Wator
+              </label>
+              <label class="btn btn-primary">
+                <input type="radio" name="mode" id="mode3" autocomplete="off"> Tetris
+              </label>
+            </div>
+            <button id="reset_button" type="button" class="btn btn-primary">Reset</button>
+          </div>
+        </div>
+
+        <div id="container_graph" class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div class="container_wrapper">
+            graph
+            <span id="graph" width="400" height="400"></span>
+          </div>
+        </div>
+
+        <div id="container_about" class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div id="footer_text" class="container_wrapper">
+            Overengineered by Sebastian von der Thannen and Thomas Heitzinger 2017
+          </div>
+        </div>
+        <div id="container_end" class="col-sm-12 col-md-12 col-lg-12 col-xl-12"></div>
+      </div>      
+    </div> 
+  </body>
 </html>
