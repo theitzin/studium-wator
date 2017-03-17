@@ -66,7 +66,7 @@ App.Run = function(){
 		App.FishSwim(fishes,sharks);
 	  	App.SharkSwim(fishes,sharks);
     	//updatePlot(fishes.length,sharks.length);
-    	console.log(fishes.length,sharks.length)
+    	//console.log(fishes.length,sharks.length)
 		lastUpdate = now;
 	}
 
@@ -164,4 +164,27 @@ App.GetRandPos = function(){
 		r[r.length] = pos;
 	}
 	return r;
+}
+
+// fixing canvas size on some aspect ratios
+$(document).ready(function () {
+    fixCss();
+});
+$(window).resize(function() {
+    fixCss();
+});
+
+function fixCss() {
+    var margin_adjust = $("#margin_adjust");
+    var max_width = $(window).height() - 22;
+    var diff = margin_adjust.width() - max_width;
+    console.log(diff);
+    if (diff > 0) {
+        $("#margin_adjust").css("padding-left", diff / 2 + "px");
+        $("#margin_adjust").css("padding-right", diff / 2 + "px");
+    }
+    else {
+        $("#margin_adjust").css("padding-left", 0 + "px");
+        $("#margin_adjust").css("padding-right", 0 + "px");
+    }
 }
