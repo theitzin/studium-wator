@@ -95,17 +95,6 @@ Entity.prototype.DistanceTo = function(entity) {
 					p.distance(ep.addXY(0, -2*App.CANVAS_HEIGHT)));
 };
 
-// maybe update to this ^^^^^^ distance function?
-
-Entity.prototype.isNeighbour = function(coords) {
-	if(abs(abs(this.position.x-coords.x)-App.CELL) < 1 && abs(abs(this.position.y-coords.y)-App.CELL) < 1){
-		return true;
-	}
-	else {
-		return false;
-	}
-};
-
 Entity.prototype.DrawShape = function(ctx, points, color) {
 	ctx.fillStyle = color;
 	ctx.beginPath();
@@ -127,9 +116,8 @@ Entity.prototype.nextPosition = function(entityList,entityListFlee) {
 	var pos = this.position.clone();
 	var f = this.fun(entityList,entityListFlee);
 	this.velocity.setVec2(this.velocity.clone().add(f.scale(h)));
-	//console.log(this.velocity);
 	this.direction.setVec2(this.velocity.clone().normalize());
-	vel.scale(h);
+	vel.scale(100*h);
 	return vel;
 }
 
@@ -140,19 +128,17 @@ Entity.prototype.fun = function(entityList,entityListFlee) {
 	var N = entityList.length;
 	var vel = this.velocity.clone();
 
-	//console.log(vel);
+	//Erweiterte Cucker-Smale-Modelle
 	var s1 = vel.scale(alpha - beta*vel.length2());
 	var s2 = new Vec2(0,0);
-	//var Bi = this.B(entityList);
-	var Ri = this.R(entityListFlee).scale(0.5);
-	var Ri2 = this.R(entityList).scale(0.1);
+	var Ri = this.R(entityListFlee).scale(0.6);
+	var Ri2 = this.R(entityList).scale(0.5);
 	Ri.add(Ri2);
-	//var Ai = this.A(entityList).scale(0.3);
-	//var Si = this.S(entityListFlee).scale(10);
-	//console.log(s1,Bi,Ri,Ai);
+	//var Bi = this.B(entityList);
+	//var Ai = this.A(entityList);
+	//var Si = this.S(entityListFlee);
 	//s1 = s1.add(Ri.add(Ai)).scale(1/m);
-	//Erweiterte Cucker-Smale-Modelle
-		/*
+	/*
 	// Cucker-Smale Partikel-Modell
 	for(var i = 0; i < N; i++){
 		if(this.position != entityList[i].position){
@@ -168,8 +154,6 @@ Entity.prototype.fun = function(entityList,entityListFlee) {
 			s2 = s2.add(NablaU(this.position,entityList[i].position));
 		}
 	}
-	//console.log(s1,s2,Si);
-	//return s2.scale(1/N);
 	return s1.add(Ri.sub(s2));
 }
 
@@ -204,9 +188,9 @@ Entity.prototype.R = function(entityList){
 	for(var i = 0; i < N;i++){
 		var r = this.position.clone().sub(entityList[i].position);
 		var rLen = r.length();
-		s = s.add(r.scale(cutoff(rLen,1,d)/(Math.pow(1+rLen*rLen,beta1))));
+		s = s.add(r.scale(cutoff(rLen,1,d)/(N*Math.pow(1+rLen*rLen,beta1))));
 	}
-	return s.scale(rho/N);
+	return s.scale(rho);
 }
 
 Entity.prototype.B = function(entityList){
@@ -264,7 +248,7 @@ function NablaU(x1,x2) {
 	var cR = 50;
 	var lA = 200;
 	var lR = 100;
-	var r = Math.max(0.000000001,x1.distance(x2));
+	var r = Math.max(0.00000000001,x1.distance(x2));
 
 	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
 	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
@@ -277,15 +261,15 @@ Fish = function(seed, pos) {
 	Entity.apply(this, arguments);
 
 	this.velocity = new Vec2(0, 0);
-	//this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
-	this.dimensions = [5, 4, 5, 2, 6, 1, 7, 3]; // length / width of head, body, butt, tail
+	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7].map(function(x) {return Math.round(x * 0.75)}); // length / width of head, body, butt, tail
 	var colorRange = [0.4, 0.6];
 	this.colors = [	HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.5, 0.8),
 					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.6),
 					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.5)];
 	this.animationSpeed = 0.1;
 
-	this.spawn = App.FISHSPAWN*Math.round(Math.random()*10);
+	this.age = Math.round(App.FISHAGE*Math.random());
+	this.spawn = Math.round(App.FISHSPAWN*Math.random());
 }
 Fish.prototype = Object.create(Entity.prototype);
 Fish.prototype.constructor = Fish;
@@ -293,11 +277,11 @@ Fish.prototype.constructor = Fish;
 Shark = function(seed, pos) {
 	Entity.apply(this, arguments);
 
-	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
+	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]//.map(function(x) {return Math.round(x * 0.75)}); // length / width of head, body, butt, tail
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
 
-	this.spawn = App.SHARKSPAWN;
+	this.spawn = Math.round(App.SHARKSPAWN*Math.random());
 	this.starving = App.SHARKSTARVE;
 }
 Shark.prototype = Object.create(Entity.prototype);

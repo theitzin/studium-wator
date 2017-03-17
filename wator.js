@@ -3,9 +3,9 @@ $(document).ready(function () {
 });
 
 var App = {
-  	INTERVAL : 20,
-  	CANVAS_WIDTH : 1000,
-  	CANVAS_HEIGHT : 600,
+  	INTERVAL : 30,
+  	CANVAS_WIDTH : 600,
+  	CANVAS_HEIGHT : 400,
   	CANVAS_ID : "canvas",
     CELL : 50,
   	XSTEP : 22,
@@ -13,12 +13,13 @@ var App = {
     TOL : 40,
     TIMESTEP : 500,
   	NSHARK : 5,
-  	NFISH : 100,
-    MAXFISH : 200,
-    MAXSHARK : 25,
-    SHARKSTARVE : 20,
-    SHARKSPAWN : 30,
-    FISHSPAWN : 10
+  	NFISH : 200,
+    MAXFISH : 300,
+    MAXSHARK : 40,
+    SHARKSTARVE : 4,
+    SHARKSPAWN : 10,
+    FISHSPAWN : 10,
+    FISHAGE : 100
 };
 
 App.Start = function(){
@@ -66,8 +67,8 @@ App.Run = function(){
 	if (now - lastUpdate > App.TIMESTEP) {
 		App.FishSwim(fishes,sharks);
   	App.SharkSwim(fishes,sharks);
-    //updatePlot(fishes.length,sharks.length);
-    console.log(fishes.length,sharks.length)
+    updatePlot(fishes.length/App.MAXFISH,sharks.length/App.MAXSHARK);
+    //console.log(fishes.length,sharks.length)
 		lastUpdate = now;
 	}
 
@@ -76,27 +77,35 @@ App.Run = function(){
 
 
 App.FishSwim = function(f,s){
-  //console.log(f[0].direction);
+  for(var i = 0; i < f.length; i++){
+    if(f[i].age <= 0){
+      f.splice(i, 1);
+    }
+    else{
+      f[i].age -= 1;
+    }
+  }
 	for(var i = 0; i < f.length; i++){
-		var direction = f[i].direction;
-		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
-		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
-    //f[i].UpdatePosition(moveX, moveY);
     var move = f[i].nextPosition(f,s);
-
-    move.scale(100);
-    //console.log(move);
-    //move.x *= Math.round(Math.random())*2-1;
-    //move.y *= Math.round(Math.random())*2-1;
-
-    if(f[i].spawn <= 0 && f.length < App.MAXFISH){
-      f.push(new Fish(Math.random(),f[i].position));
-      f[i].spawn = App.FISHSPAWN;
+    /*
+    if(move.length() < 200){
+      move.scale(130);
+    } else{
+      cosole.log("hi")
+      move.scale(200/move.length());
+    }*/
+    if(f.length < App.MAXFISH){
+      if(f[i].spawn <= 0){
+        f.push(new Fish(Math.random(),f[i].position));
+        f[i].spawn = App.FISHSPAWN;
+      }
+      else {
+        f[i].spawn -= 1;
+      }
     }
-    else {
-      f[i].spawn -= 1;
+    else{
+      f[i].spawn += 1;
     }
-    //f[i].UpdatePosition(moveX, moveY);
 		f[i].UpdatePosition(move.x, move.y);
 	}
 }
@@ -108,18 +117,34 @@ App.SharkSwim = function(f,s){
     }
   }
   for(var i = 0; i < s.length; i++){
+    var direction = s[i].direction;
     var eatFish = null;
+    var ind = 0;
+    var goTo = null;
+    var minDist = 150;
     for(var j = 0; j < f.length; j++){
       var dist = s[i].DistanceTo(f[j]);
-      if(dist < App.TOL){
-        eatFish = f[j];
-        break;
+      if(dist < minDist) {
+        if(dist < App.TOL){
+          eatFish = f[j];
+          ind = j;
+        }
+        goTo = f[j].position;
       }
     }
     if(eatFish == null){
-		  var direction = s[i].direction;
-  		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
-  		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+      /*
+      var move = s[i].nextPosition(s,[]).scale(10);
+      var moveX = move.x;
+      var moveY = move.y;
+      */
+      if(goTo == null){
+    		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+    		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+      } else {
+        var moveX = goTo.x - s[i].position.x;
+        var moveY = goTo.y - s[i].position.y;
+      }
       s[i].starving -= 1;
     }
     else {
@@ -137,16 +162,24 @@ App.SharkSwim = function(f,s){
         var moveY = eatFish.position.y - s[i].position.y;
       }
       s[i].starving = App.SHARKSTARVE;
-      f.splice(j, 1);
+      f.splice(ind, 1);
     }
-    if(s[i].spawn <= 0 && s.length < App.MAXSHARK){
-      s.push(new Shark(Math.random(),s[i].position));
-      s[i].spawn = App.SHARKSPAWN;
+    if(s.length < App.MAXSHARK){
+      if(s[i].spawn <= 0){
+
+    		var X = s[i].position.x + direction.x * 150 + 2*(Math.round(Math.random())*2-1)*this.CELL;
+    		var Y = s[i].position.y + direction.y * 150 + 2*(Math.round(Math.random())*2-1)*this.CELL;
+
+        s.push(new Shark(Math.random(),new Vec2(X,Y)));
+        s[i].spawn = App.SHARKSPAWN;
+      }
+      else {
+        s[i].spawn -= 1;
+      }
+    } else {
+      s[i].spawn += 1;
     }
-    else {
-      s[i].spawn -= 1;
-    }
-    s[i].UpdatePosition(moveX*0.5,moveY*0.5)
+    s[i].UpdatePosition(moveX,moveY)
   }
 }
 
@@ -155,9 +188,12 @@ App.GetRandPos = function(){
 	r = [];
 	while(r.length < this.NSHARK+this.NFISH){
 		var trig = false;
-		var x = Math.ceil(Math.random()*(this.XSTEP-1));
-		var y = Math.ceil(Math.random()*(this.YSTEP-1));
-		pos = new Vec2(this.CELL*x, this.CELL*y); // cells have 40px width/height
+		//var x = Math.ceil(Math.random()*(this.XSTEP-1));
+		//var y = Math.ceil(Math.random()*(this.YSTEP-1));
+		//pos = new Vec2(this.CELL*x, this.CELL*y); // cells have 40px width/height
+		var x = Math.ceil(Math.random()*(this.CANVAS_WIDTH-1));
+		var y = Math.ceil(Math.random()*(this.CANVAS_HEIGHT-1));
+		pos = new Vec2(x, y); // cells have 40px width/height
 		for(var i = 0; i < r.length; i++){
 			if(r[i].x == pos.x && r[i].y == pos.y) trig = true;
 		}

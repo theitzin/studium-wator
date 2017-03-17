@@ -2,7 +2,7 @@ function Vec2(x, y) {
   this.x = x != null ? x : 0;
   this.y = y != null ? y : 0;
 }
- 
+
 Vec2.create = function(x, y) {
   return new Vec2(x, y);
 };
@@ -44,7 +44,7 @@ Vec2.prototype.rotate = function(angle) {
 
   return this;
 };
- 
+
 Vec2.prototype.equals = function(v, tolerance) {
   if (tolerance == null) {
     tolerance = 0.0000001;
@@ -57,7 +57,7 @@ Vec2.prototype.add = function(v) {
   this.y += v.y;
   return this;
 };
- 
+
 Vec2.prototype.sub = function(v) {
   this.x -= v.x;
   this.y -= v.y;
@@ -87,7 +87,7 @@ Vec2.prototype.distance = function(v) {
   var dy = v.y - this.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
- 
+
 Vec2.prototype.squareDistance = function(v) {
   var dx = v.x - this.x;
   var dy = v.y - this.y;
@@ -99,7 +99,7 @@ Vec2.prototype.copy = function(v) {
   this.y = v.y;
   return this;
 };
- 
+
 Vec2.prototype.clone = function() {
   return new Vec2(this.x, this.y);
 };
