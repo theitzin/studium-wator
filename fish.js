@@ -41,6 +41,9 @@ Entity.prototype.Draw = function(ctx) {
 	//this.velocity.set(dataX[1], dataY[1]);
 
 	this.animationTime += 0.1 + Math.min(Math.abs(aTangential) / 50 + Math.abs(aNormal) / 20, 0.5);
+
+	if (isNaN(this.animationTime))
+		console.log("animetime");
 	var scaledBodyLength = this.dimensions[1] - Math.abs(aNormal / 2);
 
 	// anchor points

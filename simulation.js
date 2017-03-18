@@ -34,7 +34,7 @@ ClassicWator = function(width, height) {
   	this.XSTEP  = this.WIDTH / this.CELL;
   	this.YSTEP  = this.HEIGHT / this.CELL;
   	this.INITIALSHARK  = 10;
-  	this.INITIALFISH  = 100;
+  	this.INITIALFISH  = 30;
 
   	this.NSHARK = this.INITIALSHARK;
   	this.NFISH = this.INITIALFISH;
@@ -295,12 +295,12 @@ ContinuousWator.prototype.SharkSwim = function(f,s){
 			var dirY = eatFish.position.y - s[i].position.y;
 			// when shark sees fish on other side
 			if(Math.abs(dirX) > this.TOL){
-				var moveX = dirX - Math.sign(dirX)*this.CANVAS_WIDTH;
+				var moveX = dirX - Math.sign(dirX)*this.WIDTH;
 			} else {
 				var moveX = eatFish.position.x - s[i].position.x;
 			}
 			if(Math.abs(dirY) > this.TOL){
-				var moveY = dirY - Math.sign(dirY)*this.CANVAS_HEIGHT;
+				var moveY = dirY - Math.sign(dirY)*this.HEIGHT;
 			} else {
 				var moveY = eatFish.position.y - s[i].position.y;
 			}
@@ -350,9 +350,9 @@ RuleBased = function(cellSize) {
 	Behaviour.apply(this, arguments);
 
 	this.CELLSIZE = cellSize;
-	this.FBRUT = 5;
-	this.HBRUT = 20;
-	this.FASTEN = 10;
+	this.FBRUT = 15;
+	this.HBRUT = 25;
+	this.FASTEN = 15;
 
 	this.Init();
 };
