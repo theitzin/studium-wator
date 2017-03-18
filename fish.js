@@ -17,13 +17,16 @@ Entity = function(seed, pos) {
 	this.animationSpeed = 0.1;
 };
 
+Entity.prototype.CANVAS_WIDTH = 100; // default
+Entity.prototype.CANVAS_HEIGHT = 100; // default
+
 Entity.prototype.Draw = function(ctx) {
 
 	// movement data processing
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
 
-	this.position.set(dataX[0].mod(App.CANVAS_WIDTH), dataY[0].mod(App.CANVAS_HEIGHT));
+	this.position.set(dataX[0].mod(this.CANVAS_WIDTH), dataY[0].mod(this.CANVAS_HEIGHT));
 
 	var tmp = new Vec2(dataX[1], dataY[1]);
 	if (tmp.length2() > 1)
@@ -67,7 +70,6 @@ Entity.prototype.Draw = function(ctx) {
 
 // now a relative position update!
 Entity.prototype.UpdatePosition = function(x, y) {
-
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
 
@@ -80,19 +82,20 @@ Entity.prototype.UpdatePosition = function(x, y) {
 };
 
 Entity.prototype.GetTorusPosition = function() {
-	return new Vec2(this.position.x.mod(App.CANVAS_WIDTH), this.position.y.mod(App.CANVAS_HEIGHT));
+	return new Vec2(this.position.x.mod(this.CANVAS_WIDTH), this.position.y.mod(this.CANVAS_HEIGHT));
 };
 
 // gives distance between fish or shark while taking torus topology into account
 Entity.prototype.DistanceTo = function(entity) {
+
 	var p = this.GetTorusPosition();
 	var ep = entity.GetTorusPosition();
 
 	return Math.min(p.distance(ep),
-					p.distance(ep.addXY(App.CANVAS_WIDTH, 0)),
-					p.distance(ep.addXY(-2*App.CANVAS_WIDTH, 0)),
-					p.distance(ep.addXY(App.CANVAS_WIDTH, App.CANVAS_HEIGHT)),
-					p.distance(ep.addXY(0, -2*App.CANVAS_HEIGHT)));
+					p.distance(ep.addXY(this.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(-2*this.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(this.CANVAS_WIDTH, this.CANVAS_HEIGHT)),
+					p.distance(ep.addXY(0, -2*this.CANVAS_HEIGHT)));
 };
 
 Entity.prototype.DrawShape = function(ctx, points, color) {
@@ -110,151 +113,6 @@ Entity.prototype.InterpolationTime = function() {
 	return dt; //1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
 };
 
-Entity.prototype.nextPosition = function(entityList,entityListFlee) {
-	var h = 0.1;
-	var vel = this.velocity.clone();
-	var pos = this.position.clone();
-	var f = this.fun(entityList,entityListFlee);
-	this.velocity.setVec2(this.velocity.clone().add(f.scale(h)));
-	this.direction.setVec2(this.velocity.clone().normalize());
-	vel.scale(100*h);
-	return vel;
-}
-
-Entity.prototype.fun = function(entityList,entityListFlee) {
-	var alpha = 0.07;
-	var beta = 0.05;
-	var m = 1;
-	var N = entityList.length;
-	var vel = this.velocity.clone();
-
-	//Erweiterte Cucker-Smale-Modelle
-	var s1 = vel.scale(alpha - beta*vel.length2());
-	var s2 = new Vec2(0,0);
-	var Ri = this.R(entityListFlee).scale(0.5);
-	var Ri2 = this.R(entityList).scale(0.4);
-	Ri.add(Ri2);
-	//var Bi = this.B(entityList);
-	//var Ai = this.A(entityList);
-	//var Si = this.S(entityListFlee);
-	//s1 = s1.add(Ri.add(Ai)).scale(1/m);
-	/*
-	// Cucker-Smale Partikel-Modell
-	for(var i = 0; i < N; i++){
-		if(this.position != entityList[i].position){
-			var vel = entityList[i].direction.clone().sub(this.direction);
-			var pos = entityList[i].position.clone().sub(this.position);
-			var r = pos.length()
-			s2 = s2.add(vel.scale(H(r)));
-		}
-	*/
-	//Selbstantriebs, Abbremsungs, und Anziehungs–Abstoßungs-Partikel Modell
-	for(var i = 0; i < N; i++){
-		if(this.position != entityList[i].position){
-			s2 = s2.add(NablaU(this.position,entityList[i].position));
-		}
-	}
-	return s1.add(Ri.sub(s2));
-}
-
-function H(r){
-	var k = 600;
-	var sigma = 1000;
-	var gamma = 1/20;
-
-	return k/Math.pow(sigma+r*r,gamma);
-}
-
-Entity.prototype.S = function(entityList){
-	var beta1 = 1/100;
-	var N = entityList.length;
-
-	var s = new Vec2(0,0);
-	for(var i = 0; i < N;i++){
-		var r = this.position.clone().sub(entityList[i].position);
-		var rLen = r.length();
-		var v = entityList[i].velocity.clone().sub(this.velocity)
-		s = s.add(v.scale(1/(Math.pow(1+rLen,beta1))));
-	}
-	return s.scale(1/N);
-}
-Entity.prototype.R = function(entityList){
-	var rho = 10;
-	var beta1 = 1/5;
-	var d = 200;
-	var N = entityList.length;
-
-	var s = new Vec2(0,0);
-	for(var i = 0; i < N;i++){
-		var r = this.position.clone().sub(entityList[i].position);
-		var rLen = r.length();
-		s = s.add(r.scale(cutoff(rLen,1,d)/(N*Math.pow(1+rLen*rLen,beta1))));
-	}
-	return s.scale(rho);
-}
-
-Entity.prototype.B = function(entityList){
-	var d = 400;
-	var N = entityList.length;
-	var C = 10;
-
-	var rho = 0;
-	var s = new Vec2(0,0);
-	for(var i = 0; i < N;i++){
-		var r = this.position.clone().sub(entityList[i].position);
-		var rLen = r.length2();
-		rho = rho + 1/(1+rLen);
-	}
-	rho = rho/N;
-	var l = this.velocity.length();
-	return this.velocity.ortho().scale(l*C*(1-cutoff(rho,1,d)));
-}
-function cutoff(x,v,d){
-	return (1-Math.tanh(v*(x-d)))/2;
-}
-
-Entity.prototype.A = function(entityList){
-	var d = 400;
-	var N = entityList.length;
-
-	var s = new Vec2(0,0);
-	for(var i = 0; i < N;i++){
-		var r = this.position.clone().sub(entityList[i].position);
-		var v = entityList[i].velocity.clone().sub(this.velocity)
-		var rLen = r.length();
-		var w = wFun(r,this.velocity.clone());
-		s = s.add(v.scale((1-cutoff(rLen,1,d))*w));
-	}
-
-	return s.scale(1/N);
-}
-
-
-function wFun(x,v){
-	var gamma = 30;
-	var delta = 0.30;
-	var q = 10;
-	var sigma = 0.02;
-
-	var d = 20;
-	var s = gamma/Math.pow(q+x.length2(),sigma);
-	var S1 = cutoff(v.length(),1/d,d);
-	var S2 = 1-cutoff(Math.abs(x.normalize().dot(v.normalize())),1,delta)
-	return s*(S1 + (1-S1)*S2);
-}
-
-function NablaU(x1,x2) {
-	var cA = 100;
-	var cR = 50;
-	var lA = 200;
-	var lR = 100;
-	var r = Math.max(0.00000000001,x1.distance(x2));
-
-	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
-	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
-	return new Vec2(dU1, dU2);
-}
-
 // child classes fish and shark
 
 Fish = function(seed, pos) {
@@ -268,8 +126,7 @@ Fish = function(seed, pos) {
 					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.5)];
 	this.animationSpeed = 0.1;
 
-	this.age = Math.round(App.FISHAGE*Math.random());
-	this.spawn = Math.round(App.FISHSPAWN*Math.random());
+	this.spawn = 5; // default
 }
 Fish.prototype = Object.create(Entity.prototype);
 Fish.prototype.constructor = Fish;
@@ -281,8 +138,8 @@ Shark = function(seed, pos) {
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
 
-	this.spawn = Math.round(App.SHARKSPAWN*Math.random());
-	this.starving = App.SHARKSTARVE;
+	this.spawn = 30; // default TODO FIX App.SimulationMode.SHARKSPAWN;
+	this.starving = 20; // default App.SimulationMode.SHARKSTARVE;
 }
 Shark.prototype = Object.create(Entity.prototype);
 Shark.prototype.constructor = Shark;

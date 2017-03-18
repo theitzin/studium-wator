@@ -1,77 +1,81 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <html>
-   <head>
-       <meta charset="utf-8" />
-    	<title>Wator</title>
-    	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-      	<script type="text/javascript" src="wator.js"></script>
-      	<script type="text/javascript" src="fish.js"></script>
-      	<script type="text/javascript" src="vec2.js"></script>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <head>
+    <meta charset="utf-8" />
+    <title>Wator</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap-xlgrid.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-   </head>
-   <body>
-      <canvas id="canvas" style="float:left;"></canvas>
-      <div id="graph" style="float:left;"></div>
-      <script>
-      graphDiv = document.getElementById('graph');
-      var trace1 = {
-        x: [0],
-        y: [App.NFISH/App.MAXFISH],
-        type: 'scatter',
-        name: 'Fishes'
-      };
-      var trace2 = {
-        x: [0],
-        y: [App.NSHARK/App.MAXSHARK],
-        type: 'scatter',
-        name: 'Sharks'
-      };
+      <link rel="stylesheet" type="text/css" href="wator.css">
+    	<script type="text/javascript" src="wator.js"></script>
+    	<script type="text/javascript" src="fish.js"></script>
+    	<script type="text/javascript" src="vec2.js"></script>
+      <script type="text/javascript" src="simulation.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
 
-      var data = [trace1, trace2];
-      var layout = {
-        title: 'Fish/Shark Growth',
-        width: 600,
-        height: 400,
-        xaxis: {
-          title: 'Time',
-          showgrid: false,
-          zeroline: false,
-          range: [0, 50]
-        },
-        yaxis: {
-          title: 'Percent',
-          showline: false,
-          range: [0, 1]
-        }
-      };
-      Plotly.newPlot(graphDiv, data, layout);
+        <div class="col-sm-12 col-md-12 col-lg-6 col-xl-8">
+          <div id=margin_adjust>
+            <div id="container_canvas" class="container_wrapper">
+              <canvas id="canvas"></canvas>
+            </div>
+          </div>
+        </div>
 
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div id="container_about" class="container_wrapper text_wrapper">
+            <h4>About Wator</h4>
 
-      function updatePlot(f,s){
-        PLOT = document.getElementById('graph');
-        var data = PLOT.data;
-        t = data[0].x[data[0].x.length-1];
-        data[0].x.push(t+1);
-        data[1].x.push(t+1);
-        data[0].y.push(f);
-        data[1].y.push(s);
-        r = 50;
-        if(t>r){
-          var range = [t-r, t];
-          data[0].x.shift();
-          data[1].x.shift();
-          data[0].y.shift();
-          data[1].y.shift();
-          Plotly.relayout(PLOT, {'xaxis.range': range});
-        }
-        var update = {
-          x : [data[0].x, data[1].x],
-          y : [data[0].y, data[1].y],
-        }
-        Plotly.restyle(PLOT, update);
-      }
-      </script>
-   </body>
+            <p>
+            The balance of this ecosystem is very delicate: the populations of two species can follow hugely different cycles depending on the given parameters (such as reproduction cycles and the time period in which a shark must eat to avoid starvation) as well as starting positions of each being. We may go from both species being endangered to an abundance of one or both.
+            <br><br>
+            When the prey are numerous, predators can reproduce rapidly. But this increase in turn increases the number of prey hunted and the population of the prey decreases. By becoming rarer prey, predators begin to starve and die of starvation, decreasing their population and easing the pressure on hunting prey. The prey (and in time predator) can then go back to rapidly reproducing as the cycle repeats itself.
+            <br><br>
+            Time passes in discrete jumps, which I shall call chronons. During each chronon a fish or shark may move north, east, south or west to an adjacent point, provided the point is not already occupied by a member of its own species. A random-number generator makes the actual choice. For a fish the choice is simple: select one unoccupied adjacent point at random and move there. If all four adjacent points are occupied, the fish does not move. Since hunting for fish takes priority over mere movement, the rules for a shark are more complicated: from the adjacent points occupied by fish, select one at random, move there and devour the fish. If no fish are in the neighborhood, the shark moves just as a fish does, avoiding its fellow sharks.
+            </p>
+
+            <a id="documentation_link" href="url">Documentation</a>
+          </div>
+        </div>
+        <div class="clearfix visible-lg"></div>
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div id="container_controls" class="container_wrapper text_wrapper">
+            <h4>Controls</h4>
+
+            <p>
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<p>
+
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-primary active">
+                <input type="radio" name="mode" id="mode1" autocomplete="off" checked> Continuous Wator
+              </label>
+              <label class="btn btn-primary">
+                <input type="radio" name="mode" id="mode2" autocomplete="off"> Classic Wator
+              </label>
+              <label class="btn btn-primary">
+                <input type="radio" name="mode" id="mode3" autocomplete="off"> Tetris
+              </label>
+            </div>
+            <button id="reset_button" type="button" class="btn btn-primary">Reset</button>
+          </div>
+        </div>
+
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div id="container_graph" class="container_wrapper text_wrapper">
+            <div id="graph"></div>
+            <script type="text/javascript" src="plot.js"></script>
+
+          </div>
+        </div>
+
+        <div id="container_end" class="col-sm-12 col-md-12 col-lg-12 col-xl-12"></div>
+      </div>
+    </div>
+  </body>
 </html>

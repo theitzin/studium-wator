@@ -1,0 +1,48 @@
+body {
+	background-color: #e8e8e8;
+	position: relative;
+}
+
+.container_wrapper {
+	background-color: white;
+	margin: 8px -7px 0px -7px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.text_wrapper {
+	padding: 10px 15px 15px 15px;
+}
+
+#container_canvas {
+	background: none;
+}
+
+#canvas {
+	width: 100%;
+	max-height: calc(100vh - 22px);
+	vertical-align: middle;
+}
+
+#container_about {
+	height: ;
+}
+
+#container_controls {
+}
+
+#container_graph {
+}
+
+#container_end {
+	padding-bottom: 5px;
+	margin-bottom: 3px;
+}
+
+#documentation_link {
+	display: block;
+	text-align: right;
+}
+
+#reset_button {
+	display: inline-block;
+}
