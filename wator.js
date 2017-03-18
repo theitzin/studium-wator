@@ -4,6 +4,7 @@ $(document).ready(function () {
 
 var App = {
   	INTERVAL : 20,
+    PLOT_INTERVAL : 1000, 
   	CANVAS_WIDTH : 1000,
   	CANVAS_HEIGHT : 1000,
   	CANVAS_ID : "canvas",
@@ -15,7 +16,8 @@ App.Start = function() {
 
   	App.Init();
     App.InitEvents();
-	setTimeout("App.Run()", this.INTERVAL);
+	App.Run();
+    App.PlotUpdate();
 };
 
 App.Init = function() {
@@ -44,11 +46,14 @@ App.InitEvents = function() {
 
 App.Run = function() {
 	this.SimulationMode.Run(this.ctx);
-
-    var [nfish, nshark] = this.SimulationMode.GetPopulationData();
-    this.PopulationPlot.Update(nfish, nshark, this.INTERVAL / 1000);
     fixCss();
  	setTimeout("App.Run()", this.INTERVAL);
+};
+
+App.PlotUpdate = function() {
+    var [nfish, nshark] = this.SimulationMode.GetPopulationData();
+    this.PopulationPlot.Update(nfish, nshark, this.PLOT_INTERVAL / 1000);
+    setTimeout("App.PlotUpdate()", this.PLOT_INTERVAL);
 };
 
 function fixCss() {
