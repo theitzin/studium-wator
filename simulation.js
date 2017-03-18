@@ -36,8 +36,8 @@ ClassicWator = function(width, height) {
   	this.INITIALSHARK  = 10;
   	this.INITIALFISH  = 100;
 
-  	this.nShark = this.INITIALSHARK;
-  	this.nFish = this.INITIALFISH;
+  	this.NSHARK = this.INITIALSHARK;
+  	this.NFISH = this.INITIALFISH;
 
   	this.BACKGROUND_COLOR = "#b4cef7";
   	this.TIMESTEP = 2000;
@@ -58,7 +58,7 @@ ClassicWator.prototype.Init = function() {
 		var position = this.GetRandomPosition();
 		if (this.grid[position.x][position.y] == 0) {
 			canvasPosition = position.clone().scale(this.CELL).addXY(this.CELL / 2, this.CELL / 2);
-			behaviourData = { "age" : 0, "iteration" : 0 };
+			behaviourData = { "age" : Math.floor(Math.random() * this.behaviour.FBRUT), "iteration" : 0 };
 			this.grid[position.x][position.y] = new Fish(Math.random(), canvasPosition, behaviourData);
 		}
 		else {
@@ -70,7 +70,7 @@ ClassicWator.prototype.Init = function() {
 		var position = this.GetRandomPosition();
 		if (this.grid[position.x][position.y] == 0) {
 			canvasPosition = position.clone().scale(this.CELL).addXY(this.CELL / 2, this.CELL / 2);
-			behaviourData = { "age" : 0, "fasten" : 0, "iteration" : 0 };
+			behaviourData = { "age" : Math.floor(Math.random() * this.behaviour.HBRUT), "fasten" : 0, "iteration" : 0 };
 			this.grid[position.x][position.y] = new Shark(Math.random(), canvasPosition, behaviourData);
 		}
 		else {
@@ -97,15 +97,15 @@ ClassicWator.prototype.Update = function() {
 		}
 	}
 
-	this.nFish = 0;
-	this.nShark = 0;
+	this.NFISH = 0;
+	this.NSHARK = 0;
 	for (var i = 0; i < this.XSTEP; i++) {
 		for (var j = 0; j < this.YSTEP; j++) {
 			if (this.grid[i][j] instanceof Fish) {
-				this.nFish++;
+				this.NFISH++;
 			}
 			if (this.grid[i][j] instanceof Shark) {
-				this.nShark++;
+				this.NSHARK++;
 			}
 		}
 	}
@@ -350,8 +350,8 @@ RuleBased = function(cellSize) {
 	Behaviour.apply(this, arguments);
 
 	this.CELLSIZE = cellSize;
-	this.FBRUT = 8;
-	this.HBRUT = 10;
+	this.FBRUT = 5;
+	this.HBRUT = 20;
 	this.FASTEN = 10;
 
 	this.Init();
@@ -386,7 +386,7 @@ RuleBased.prototype.NextPosition = function(x, y, grid, iteration) {
 
 		if (!delta.isZero() && entity.behaviourData["age"] >= this.FBRUT) {
 			entity.behaviourData["age"] = 0;
-			var behaviourData = { "age" : 0, "iteration" : iteration };
+			var behaviourData = { "age" : Math.floor(Math.random() * this.FBRUT), "iteration" : iteration };
 			var canvasPosition = new Vec2(x, y).scale(this.CELLSIZE).addXY(this.CELLSIZE / 2, this.CELLSIZE / 2);
 			grid[x][y] = new Fish(Math.random(), canvasPosition, behaviourData);
 		}
@@ -424,7 +424,7 @@ RuleBased.prototype.NextPosition = function(x, y, grid, iteration) {
 
 		if (!delta.isZero() && entity.behaviourData["age"] >= this.HBRUT) {
 			entity.behaviourData["age"] = 0;
-			var behaviourData = { "age" : 0, "fasten" : 0, "iteration" : iteration };
+			var behaviourData = { "age" : Math.floor(Math.random() * this.HBRUT), "fasten" : 0, "iteration" : iteration };
 			var canvasPosition = new Vec2(x, y).scale(this.CELLSIZE).addXY(this.CELLSIZE / 2, this.CELLSIZE / 2);
 			grid[x][y] = new Shark(Math.random(), canvasPosition, behaviourData);
 		}
