@@ -9,15 +9,17 @@ Plot = function(id) {
 Plot.prototype.Create = function() {
   var trace1 = {
     x: [0],
-    y: [App.NFISH/App.MAXFISH],
+    y: [0],
     type: 'scatter',
+    mode: 'lines',
     name: 'Fishes'
   };
 
   var trace2 = {
     x: [0],
-    y: [App.NSHARK/App.MAXSHARK],
+    y: [0],
     type: 'scatter',
+    mode: 'lines',
     name: 'Sharks'
   };
 
