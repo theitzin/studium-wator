@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>Wator</title>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-      <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap-xlgrid.min.css">      
+      <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap-xlgrid.min.css">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
       <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -15,6 +15,7 @@
     	<script type="text/javascript" src="fish.js"></script>
     	<script type="text/javascript" src="vec2.js"></script>
       <script type="text/javascript" src="simulation.js"></script>
+      <script type="text/javascript" src="plot.js"></script>
   </head>
   <body>
     <div class="container-fluid">
@@ -25,7 +26,15 @@
             <div id="container_canvas" class="container_wrapper">
               <canvas id="canvas"></canvas>
             </div>
-          </div>          
+          </div>
+        </div>
+
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div id="container_graph" class="container_wrapper text_wrapper">
+            <h4>Populations</h4>
+            <div id="graph"></div>
+            <!-- <script type="text/javascript" src="plot.js"></script> -->
+          </div>
         </div>
 
         <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
@@ -36,10 +45,7 @@
             The balance of this ecosystem is very delicate: the populations of two species can follow hugely different cycles depending on the given parameters (such as reproduction cycles and the time period in which a shark must eat to avoid starvation) as well as starting positions of each being. We may go from both species being endangered to an abundance of one or both.
             <br><br>
             When the prey are numerous, predators can reproduce rapidly. But this increase in turn increases the number of prey hunted and the population of the prey decreases. By becoming rarer prey, predators begin to starve and die of starvation, decreasing their population and easing the pressure on hunting prey. The prey (and in time predator) can then go back to rapidly reproducing as the cycle repeats itself.
-            <br><br>
-            Time passes in discrete jumps, which I shall call chronons. During each chronon a fish or shark may move north, east, south or west to an adjacent point, provided the point is not already occupied by a member of its own species. A random-number generator makes the actual choice. For a fish the choice is simple: select one unoccupied adjacent point at random and move there. If all four adjacent points are occupied, the fish does not move. Since hunting for fish takes priority over mere movement, the rules for a shark are more complicated: from the adjacent points occupied by fish, select one at random, move there and devour the fish. If no fish are in the neighborhood, the shark moves just as a fish does, avoiding its fellow sharks.
             </p>
-            
             <a id="documentation_link" href="url">Documentation</a>
           </div>
         </div>
@@ -66,15 +72,8 @@
           </div>
         </div>
 
-        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
-          <div id="container_graph" class="container_wrapper text_wrapper">
-            graph
-            <span id="graph" width="400" height="400"></span>
-          </div>
-        </div>
-
         <div id="container_end" class="col-sm-12 col-md-12 col-lg-12 col-xl-12"></div>
-      </div>      
-    </div> 
+      </div>
+    </div>
   </body>
 </html>

@@ -26,6 +26,7 @@ App.Init = function() {
     Entity.prototype.CANVAS_WIDTH = this.CANVAS_WIDTH;
     Entity.prototype.CANVAS_HEIGHT = this.CANVAS_HEIGHT;
     this.SimulationMode = new ContinuousWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    this.PopulationPlot = new Plot("graph");
 };
 
 App.InitEvents = function() {
@@ -43,17 +44,13 @@ App.InitEvents = function() {
 
 App.Run = function() {
 	this.SimulationMode.Run(this.ctx);
+
+    var [nfish, nshark] = this.SimulationMode.GetPopulationData();
+    this.PopulationPlot.Update(nfish, nshark, this.INTERVAL / 1000);
+    this.PopulationPlot.Relayout();
     fixCss();
  	setTimeout("App.Run()", this.INTERVAL);
 };
-
-/*// fixing canvas size on some aspect ratios
-$(document).ready(function () {
-    fixCss();
-});
-$(window).resize(function() {
-    fixCss();
-});*/
 
 function fixCss() {
     var margin_adjust = $("#margin_adjust");

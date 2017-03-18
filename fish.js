@@ -75,7 +75,6 @@ Entity.prototype.Draw = function(ctx) {
 
 // now a relative position update!
 Entity.prototype.UpdatePosition = function(x, y) {
-
 	var goalX = this.interpolatorX.GoalValue();
 	var goalY = this.interpolatorY.GoalValue();
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
@@ -89,7 +88,7 @@ Entity.prototype.UpdatePosition = function(x, y) {
 	this.interpolationStart = Date.now();
 };
 
-Entity.prototype.GetTorusPosition = function() { 
+Entity.prototype.GetTorusPosition = function() {
 	return new Vec2(this.position.x.mod(this.CANVAS_WIDTH), this.position.y.mod(this.CANVAS_HEIGHT));
 };
 
@@ -127,8 +126,7 @@ Fish = function(seed, pos, behaviourData) {
 	Entity.apply(this, arguments);
 
 	this.velocity = new Vec2(0, 0);
-	//this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
-	this.dimensions = [5, 4, 5, 2, 6, 1, 7, 3]; // length / width of head, body, butt, tail
+	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7].map(function(x) {return Math.round(x * 0.5)}); // length / width of head, body, butt, tail
 	var colorRange = [0.4, 0.6];
 	this.colors = [	HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.5, 0.8),
 					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.6),
@@ -143,7 +141,7 @@ Fish.prototype.constructor = Fish;
 Shark = function(seed, pos, behaviourData) {
 	Entity.apply(this, arguments);
 
-	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
+	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14].map(function(x) {return Math.round(x * 0.5)}); // length / width of head, body, butt, tail
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
 }

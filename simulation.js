@@ -23,6 +23,7 @@ SimulationMode.prototype.Init = function() {};
 SimulationMode.prototype.Update = function() {};
 SimulationMode.prototype.DrawEnvironment = function(ctx) {};
 SimulationMode.prototype.DrawEntities = function(ctx) {};
+SimulationMode.prototype.GetPopulationData = function() {};
 
 // child classes of SimulationMode
 // classic Wator
@@ -36,8 +37,8 @@ ClassicWator = function(width, height) {
   	this.INITIALSHARK  = 10;
   	this.INITIALFISH  = 30;
 
-  	this.NSHARK = this.INITIALSHARK;
-  	this.NFISH = this.INITIALFISH;
+  	this.nshark = this.INITIALSHARK;
+  	this.nfish = this.INITIALFISH;
 
   	this.BACKGROUND_COLOR = "#b4cef7";
   	this.TIMESTEP = 2000;
@@ -97,15 +98,15 @@ ClassicWator.prototype.Update = function() {
 		}
 	}
 
-	this.NFISH = 0;
-	this.NSHARK = 0;
+	this.nfish = 0;
+	this.nshark = 0;
 	for (var i = 0; i < this.XSTEP; i++) {
 		for (var j = 0; j < this.YSTEP; j++) {
 			if (this.grid[i][j] instanceof Fish) {
-				this.NFISH++;
+				this.nfish++;
 			}
 			if (this.grid[i][j] instanceof Shark) {
-				this.NSHARK++;
+				this.nshark++;
 			}
 		}
 	}
@@ -133,6 +134,11 @@ ClassicWator.prototype.DrawEntities = function(ctx) {
 		}
 	}
 };
+
+ClassicWator.prototype.GetPopulationData = function() {
+	return [this.nfish / this.XSTEP / this.YSTEP, this.nshark / this.XSTEP / this.YSTEP];
+};
+
 
 ClassicWator.prototype.GetRandomPosition = function() {
 	var x = Math.floor(Math.random()*(this.XSTEP-1));
@@ -202,7 +208,7 @@ ContinuousWator.prototype.constructor = ContinuousWator;
 
 ContinuousWator.prototype.Init = function() {
 	pos = this.GetRandPos();
- 
+
 	for(var i = 0; i < this.NSHARK; i++) {
 		behaviourData = { "spawn": 30, "starving": 20 };
 		this.sharks.push(new Shark(Math.random(),pos[i], behaviourData));
@@ -231,30 +237,21 @@ ContinuousWator.prototype.DrawEntities = function(ctx) {
 	for(var i = 0; i < this.sharks.length; i++){
 		this.sharks[i].Draw(ctx);
 	}
-	var now = Date.now();
-	if (now - this.lastUpdate > this.TIMESTEP) {
-		this.FishSwim(this.fishes,this.sharks);
-	  	this.SharkSwim(this.fishes,this.sharks);
-    	//updatePlot(this.fishes.length,this.sharks.length);
-    	//console.log(this.fishes.length,this.sharks.length)
-		this.lastUpdate = now;
-	}
+};
+
+ContinuousWator.prototype.GetPopulationData = function() {
+	return [this.fishes.length / this.MAXFISH, this.sharks.length / this.MAXSHARK];
 };
 
 ContinuousWator.prototype.FishSwim = function(f,s){
-  //console.log(f[0].direction);
+//<<<<<<< HEAD
 	for(var i = 0; i < f.length; i++){
 		var direction = f[i].direction;
 		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
 		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
 
-	    //f[i].UpdatePosition(moveX, moveY);
 	    var move = this.behaviour.NextPosition(f[i], f,s);
-
 	    move.scale(100);
-	    //console.log(move);
-	    //move.x *= Math.round(Math.random())*2-1;
-	    //move.y *= Math.round(Math.random())*2-1;
 
 	    if(f[i].behaviourData["spawn"] <= 0 && f.length < this.MAXFISH){
 	    	behaviourData = { "spawn": this.FISHSPAWN*Math.round(Math.random()*10) };
@@ -264,8 +261,31 @@ ContinuousWator.prototype.FishSwim = function(f,s){
 	    else {
 	      	f[i].behaviourData["spawn"] -= 1;
 	    }
-	    //f[i].UpdatePosition(moveX, moveY);
 		f[i].UpdatePosition(move.x, move.y);
+/*=======
+	for(var i = 0; i < f.length; i++){
+		if(f[i].age <= 0){
+			f.splice(i, 1);
+		}
+		else{
+			f[i].age -= 1;
+		}
+	}
+	for(var i = 0; i < f.length; i++){
+
+	    var move = this.behaviour.NextPosition(f[i],f,s);
+	    if(f[i].spawn <= 0 && f.length < this.MAXFISH){
+		    f.push(new Fish(Math.random(),f[i].position));
+		    f[i].spawn = this.FISHSPAWN;
+	    }
+	    else if(f.length > this.MAXFISH){
+	      	f[i].spawn += 1;
+	    }
+	    else {
+	      	f[i].spawn -= 1;
+	    }
+			f[i].UpdatePosition(move.x, move.y);
+>>>>>>> experimental*/
 	}
 };
 
@@ -276,6 +296,7 @@ ContinuousWator.prototype.SharkSwim = function(f,s){
 		}
 	}
 	for(var i = 0; i < s.length; i++){
+//<<<<<<< HEAD
 		var eatFish = null;
 		for(var j = 0; j < f.length; j++){
 		  	var dist = s[i].DistanceTo(f[j]);
@@ -316,16 +337,75 @@ ContinuousWator.prototype.SharkSwim = function(f,s){
 		  	s[i].behaviourData["spawn"] -= 1;
 		}
 		s[i].UpdatePosition(moveX*0.5,moveY*0.5)
+/*=======
+    var direction = s[i].direction;
+    var ind = null;
+    var goTo = null;
+    var minDist = 100;
+    for(var j = 0; j < f.length; j++){
+      var dist = s[i].DistanceTo(f[j]);
+      if(dist < minDist) {
+        if(dist < this.TOL){
+          ind = j;
+          break;
+        }
+        goTo = f[j].position;
+      }
+    }
+    if(ind == null){
+      if(goTo == null){
+    		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+    		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
+      } else {
+        var moveX = (goTo.x - s[i].position.x)*0.5;
+        var moveY = (goTo.y - s[i].position.y)*0.5;
+      }
+      s[i].starving -= 1;
+    }
+    else {
+      var dirX = f[ind].position.x - s[i].position.x;
+      var dirY = f[ind].position.y - s[i].position.y;
+      // when shark sees fish on other side
+      if(Math.abs(dirX) > this.TOL){
+        var moveX = dirX - Math.sign(dirX)*this.CANVAS_WIDTH;
+      } else {
+        var moveX = f[ind].position.x - s[i].position.x;
+      }
+      if(Math.abs(dirY) > this.TOL){
+        var moveY = dirY - Math.sign(dirY)*this.CANVAS_HEIGHT;
+      } else {
+        var moveY = f[ind].position.y - s[i].position.y;
+      }
+      s[i].starving = this.SHARKSTARVE;
+      f.splice(ind, 1);
+    }
+		if(s.length < this.MAXSHARK){
+      if(s[i].spawn <= 0){
+
+    		var X = s[i].position.x + direction.x * 150 + 2*(Math.round(Math.random())*2-1)*this.CELL;
+    		var Y = s[i].position.y + direction.y * 150 + 2*(Math.round(Math.random())*2-1)*this.CELL;
+
+        s.push(new Shark(Math.random(),new Vec2(X,Y)));
+        s[i].spawn = this.SHARKSPAWN;
+      }
+      else {
+        s[i].spawn -= 1;
+      }
+    } else {
+      s[i].spawn += 1;
+    }
+    s[i].UpdatePosition(moveX,moveY)
+>>>>>>> experimental*/
 	}
 };
 
-ContinuousWator.prototype.GetRandPos = function(){
+ContinuousWator.prototype.GetRandPos = function() {
 	r = [];
 	while(r.length < this.NSHARK+this.NFISH){
 		var trig = false;
-		var x = Math.ceil(Math.random()*(this.XSTEP-1));
-		var y = Math.ceil(Math.random()*(this.YSTEP-1));
-		pos = new Vec2(this.CELL*x, this.CELL*y); // cells have 40px width/height
+		var x = Math.ceil(Math.random()*(this.WIDTH-1));
+		var y = Math.ceil(Math.random()*(this.HEIGHT-1));
+		pos = new Vec2(x, y);
 		for(var i = 0; i < r.length; i++){
 			if(r[i].x == pos.x && r[i].y == pos.y) trig = true;
 		}
@@ -334,7 +414,6 @@ ContinuousWator.prototype.GetRandPos = function(){
 	}
 	return r;
 };
-
 
 
 
@@ -463,7 +542,7 @@ RuleBased.prototype.GetDirections = function(x, y, grid, lambda) {
 
 
 SwarmBehaviour = function() {
-	Behaviour.apply(this, arguments);	
+	Behaviour.apply(this, arguments);
 };
 SwarmBehaviour.prototype = Object.create(Behaviour.prototype);
 SwarmBehaviour.prototype.constructor = Behaviour;
@@ -474,11 +553,10 @@ SwarmBehaviour.prototype.NextPosition = function(entity, entityList,entityListFl
 	var pos = entity.position.clone();
 	var f = this.fun(entity, entityList,entityListFlee);
 	entity.velocity.setVec2(entity.velocity.clone().add(f.scale(h)));
-	//console.log(entity.velocity);
 	entity.direction.setVec2(entity.velocity.clone().normalize());
-	vel.scale(h);
+	vel.scale(100*h);
 	return vel;
-};
+}
 
 SwarmBehaviour.prototype.fun = function(entity, entityList,entityListFlee) {
 	var alpha = 0.07;
@@ -487,18 +565,20 @@ SwarmBehaviour.prototype.fun = function(entity, entityList,entityListFlee) {
 	var N = entityList.length;
 	var vel = entity.velocity.clone();
 
-	//console.log(vel);
+	//Erweiterte Cucker-Smale-Modelle
 	var s1 = vel.scale(alpha - beta*vel.length2());
 	var s2 = new Vec2(0,0);
-	//var Bi = entity.B(entityList);
 	var Ri = this.R(entity, entityListFlee).scale(0.5);
-	var Ri2 = this.R(entity, entityList).scale(0.1);
+	var Ri2 = this.R(entity, entityList).scale(0.3);
+	if(isNaN(Ri.y)){
+		console.log("y",Ri);
+	}
 	Ri.add(Ri2);
-	//var Ai = this.A(entity, entityList).scale(0.3);
-	//var Si = this.S(entity, entityListFlee).scale(10);
-	//console.log(s1,Bi,Ri,Ai);
+
+	//var Ai = this.A(entity, entityList);
+	//var Bi = entity.B(entityList);
+	//var Si = this.S(entity, entityListFlee);
 	//s1 = s1.add(Ri.add(Ai)).scale(1/m);
-	//Erweiterte Cucker-Smale-Modelle
 		/*
 	// Cucker-Smale Partikel-Modell
 	for(var i = 0; i < N; i++){
@@ -515,10 +595,8 @@ SwarmBehaviour.prototype.fun = function(entity, entityList,entityListFlee) {
 			s2 = s2.add(NablaU(entity.position,entityList[i].position));
 		}
 	}
-	//console.log(s1,s2,Si);
-	//return s2.scale(1/N);
 	return s1.add(Ri.sub(s2));
-};
+}
 
 function H(r){
 	var k = 600;
@@ -537,9 +615,9 @@ SwarmBehaviour.prototype.S = function(entity, entityList){
 		var r = entity.position.clone().sub(entityList[i].position);
 		var rLen = r.length();
 		var v = entityList[i].velocity.clone().sub(entity.velocity)
-		s = s.add(v.scale(1/(Math.pow(1+rLen,beta1))));
+		s = s.add(v.scale(1/(N*Math.pow(1+rLen,beta1))));
 	}
-	return s.scale(1/N);
+	return s;
 };
 
 SwarmBehaviour.prototype.R = function(entity, entityList){
@@ -552,9 +630,9 @@ SwarmBehaviour.prototype.R = function(entity, entityList){
 	for(var i = 0; i < N;i++){
 		var r = entity.position.clone().sub(entityList[i].position);
 		var rLen = r.length();
-		s = s.add(r.scale(cutoff(rLen,1,d)/(Math.pow(1+rLen*rLen,beta1))));
+		s = s.add(r.scale(cutoff(rLen,1,d)/(N*Math.pow(1+rLen*rLen,beta1))));
 	}
-	return s.scale(rho/N);
+	return s.scale(rho);
 };
 
 SwarmBehaviour.prototype.B = function(entity, entityList){
@@ -588,10 +666,9 @@ SwarmBehaviour.prototype.A = function(entity, entityList){
 		var v = entityList[i].velocity.clone().sub(entity.velocity)
 		var rLen = r.length();
 		var w = wFun(r,entity.velocity.clone());
-		s = s.add(v.scale((1-cutoff(rLen,1,d))*w));
+		s = s.add(v.scale((1-cutoff(rLen,1,d))*w/N));
 	}
-
-	return s.scale(1/N);
+	return s;
 };
 
 function wFun(x,v){
@@ -612,7 +689,7 @@ function NablaU(x1,x2) {
 	var cR = 50;
 	var lA = 200;
 	var lR = 100;
-	var r = Math.max(0.000000001,x1.distance(x2));
+	var r = Math.max(0.00000000001,x1.distance(x2));
 
 	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
 	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
