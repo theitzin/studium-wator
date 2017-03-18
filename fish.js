@@ -17,6 +17,9 @@ Entity = function(seed, pos) {
 	this.animationSpeed = 0.1;
 };
 
+Entity.prototype.CANVAS_WIDTH = 100; // default
+Entity.prototype.CANVAS_HEIGHT = 100; // default
+
 Entity.prototype.Draw = function(ctx) {
 
 	// movement data processing
@@ -80,7 +83,7 @@ Entity.prototype.UpdatePosition = function(x, y) {
 };
 
 Entity.prototype.GetTorusPosition = function() { 
-	return new Vec2(this.position.x.mod(App.CANVAS_WIDTH), this.position.y.mod(App.CANVAS_HEIGHT));
+	return new Vec2(this.position.x.mod(this.CANVAS_WIDTH), this.position.y.mod(this.CANVAS_HEIGHT));
 };
 
 // gives distance between fish or shark while taking torus topology into account
@@ -90,21 +93,10 @@ Entity.prototype.DistanceTo = function(entity) {
 	var ep = entity.GetTorusPosition();
 
 	return Math.min(p.distance(ep),
-					p.distance(ep.addXY(App.CANVAS_WIDTH, 0)),
-					p.distance(ep.addXY(-2*App.CANVAS_WIDTH, 0)),
-					p.distance(ep.addXY(App.CANVAS_WIDTH, App.CANVAS_HEIGHT)),
-					p.distance(ep.addXY(0, -2*App.CANVAS_HEIGHT)));
-};
-
-// maybe update to this ^^^^^^ distance function?
-
-Entity.prototype.isNeighbour = function(coords) {
-	if(abs(abs(this.position.x-coords.x)-App.CELL) < 1 && abs(abs(this.position.y-coords.y)-App.CELL) < 1){
-		return true;
-	}
-	else {
-		return false;
-	}
+					p.distance(ep.addXY(this.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(-2*this.CANVAS_WIDTH, 0)),
+					p.distance(ep.addXY(this.CANVAS_WIDTH, this.CANVAS_HEIGHT)),
+					p.distance(ep.addXY(0, -2*this.CANVAS_HEIGHT)));
 };
 
 Entity.prototype.DrawShape = function(ctx, points, color) {
@@ -131,6 +123,8 @@ Entity.prototype.nextPosition = function(entityList,entityListFlee) {
 	//console.log(this.velocity);
 	this.direction.setVec2(this.velocity.clone().normalize());
 	vel.scale(h);
+	if(isNaN(vel.x) || isNaN(vel.y))
+		console.log("lsdfj");
 	return vel;
 }
 
@@ -286,7 +280,7 @@ Fish = function(seed, pos) {
 					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.5)];
 	this.animationSpeed = 0.1;
 
-	this.spawn = App.FISHSPAWN*Math.round(Math.random()*10);
+	this.spawn = Math.round(Math.random()*10);// TODO FIX App.SimulationMode.FISHSPAWN*Math.round(Math.random()*10);
 }
 Fish.prototype = Object.create(Entity.prototype);
 Fish.prototype.constructor = Fish;
@@ -298,8 +292,8 @@ Shark = function(seed, pos) {
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
 
-	this.spawn = App.SHARKSPAWN;
-	this.starving = App.SHARKSTARVE;
+	this.spawn = 30; // TODO FIX App.SimulationMode.SHARKSPAWN;
+	this.starving = 20; // App.SimulationMode.SHARKSTARVE;
 }
 Shark.prototype = Object.create(Entity.prototype);
 Shark.prototype.constructor = Shark;
