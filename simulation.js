@@ -62,10 +62,13 @@ ContinuousWator.prototype.Init = function() {
  
 	for(var i = 0; i < this.NSHARK; i++) {
 		this.sharks.push(new Shark(Math.random(),pos[i]));
+		this.sharks[this.sharks.length - 1].spawn = 30;
+		this.sharks[this.sharks.length - 1].starving = 20;
 	}
 
 	for(var i = this.NSHARK; i < this.NSHARK + this.NFISH; i++) {
 		this.fishes.push(new Fish(Math.random(),pos[i]));
+		this.fishes[this.fishes.length - 1].spawn = this.FISHSPAWN*Math.round(Math.random()*10);
 	}
 };
 
