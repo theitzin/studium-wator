@@ -12,8 +12,8 @@
 
    </head>
    <body>
-      <canvas id="canvas" width="800" height="500"></canvas>
-      <div id="graph"></div>
+      <canvas id="canvas" style="float:left;"></canvas>
+      <div id="graph" style="float:left;"></div>
       <script>
       graphDiv = document.getElementById('graph');
       var trace1 = {
@@ -32,13 +32,13 @@
       var data = [trace1, trace2];
       var layout = {
         title: 'Fish/Shark Growth',
-        width: 500,
-        height: 500,
+        width: 600,
+        height: 400,
         xaxis: {
           title: 'Time',
           showgrid: false,
           zeroline: false,
-          range: [0, 100]
+          range: [0, 50]
         },
         yaxis: {
           title: 'Percent',
@@ -57,21 +57,19 @@
         data[1].x.push(t+1);
         data[0].y.push(f);
         data[1].y.push(s);
-        if(t>100){
-          var range = [t-100, t];
+        r = 50;
+        if(t>r){
+          var range = [t-r, t];
           data[0].x.shift();
           data[1].x.shift();
           data[0].y.shift();
           data[1].y.shift();
-        }
-        else {
-          var range = [0, 100];
+          Plotly.relayout(PLOT, {'xaxis.range': range});
         }
         var update = {
           x : [data[0].x, data[1].x],
           y : [data[0].y, data[1].y],
         }
-        Plotly.relayout(PLOT, {'xaxis.range': range});
         Plotly.restyle(PLOT, update);
       }
       </script>

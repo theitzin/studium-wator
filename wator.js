@@ -5,9 +5,9 @@ $(document).ready(function () {
 var App = {
   	INTERVAL : 30,
   	CANVAS_WIDTH : 600,
-  	CANVAS_HEIGHT : 400,
+  	CANVAS_HEIGHT : 600,
   	CANVAS_ID : "canvas",
-    CELL : 50,
+    CELL : 30,
   	XSTEP : 22,
   	YSTEP : 12,
     TOL : 40,
@@ -118,21 +118,20 @@ App.SharkSwim = function(f,s){
   }
   for(var i = 0; i < s.length; i++){
     var direction = s[i].direction;
-    var eatFish = null;
-    var ind = 0;
+    var ind = null;
     var goTo = null;
-    var minDist = 150;
+    var minDist = 100;
     for(var j = 0; j < f.length; j++){
       var dist = s[i].DistanceTo(f[j]);
       if(dist < minDist) {
         if(dist < App.TOL){
-          eatFish = f[j];
           ind = j;
+          break;
         }
         goTo = f[j].position;
       }
     }
-    if(eatFish == null){
+    if(ind == null){
       /*
       var move = s[i].nextPosition(s,[]).scale(10);
       var moveX = move.x;
@@ -142,24 +141,24 @@ App.SharkSwim = function(f,s){
     		var moveX = direction.x * 150 + (Math.round(Math.random())*2-1)*this.CELL;
     		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
       } else {
-        var moveX = goTo.x - s[i].position.x;
-        var moveY = goTo.y - s[i].position.y;
+        var moveX = (goTo.x - s[i].position.x)*0.5;
+        var moveY = (goTo.y - s[i].position.y)*0.5;
       }
       s[i].starving -= 1;
     }
     else {
-      var dirX = eatFish.position.x - s[i].position.x;
-      var dirY = eatFish.position.y - s[i].position.y;
+      var dirX = f[ind].position.x - s[i].position.x;
+      var dirY = f[ind].position.y - s[i].position.y;
       // when shark sees fish on other side
       if(Math.abs(dirX) > App.TOL){
         var moveX = dirX - Math.sign(dirX)*App.CANVAS_WIDTH;
       } else {
-        var moveX = eatFish.position.x - s[i].position.x;
+        var moveX = f[ind].position.x - s[i].position.x;
       }
       if(Math.abs(dirY) > App.TOL){
         var moveY = dirY - Math.sign(dirY)*App.CANVAS_HEIGHT;
       } else {
-        var moveY = eatFish.position.y - s[i].position.y;
+        var moveY = f[ind].position.y - s[i].position.y;
       }
       s[i].starving = App.SHARKSTARVE;
       f.splice(ind, 1);

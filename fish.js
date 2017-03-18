@@ -131,8 +131,8 @@ Entity.prototype.fun = function(entityList,entityListFlee) {
 	//Erweiterte Cucker-Smale-Modelle
 	var s1 = vel.scale(alpha - beta*vel.length2());
 	var s2 = new Vec2(0,0);
-	var Ri = this.R(entityListFlee).scale(0.6);
-	var Ri2 = this.R(entityList).scale(0.5);
+	var Ri = this.R(entityListFlee).scale(0.5);
+	var Ri2 = this.R(entityList).scale(0.4);
 	Ri.add(Ri2);
 	//var Bi = this.B(entityList);
 	//var Ai = this.A(entityList);
@@ -261,7 +261,7 @@ Fish = function(seed, pos) {
 	Entity.apply(this, arguments);
 
 	this.velocity = new Vec2(0, 0);
-	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7].map(function(x) {return Math.round(x * 0.75)}); // length / width of head, body, butt, tail
+	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7].map(function(x) {return Math.round(x * 0.5)}); // length / width of head, body, butt, tail
 	var colorRange = [0.4, 0.6];
 	this.colors = [	HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.5, 0.8),
 					HSVtoRGB(colorRange[0] + seed*(colorRange[1] - colorRange[0]), 0.7, 0.6),
@@ -277,7 +277,7 @@ Fish.prototype.constructor = Fish;
 Shark = function(seed, pos) {
 	Entity.apply(this, arguments);
 
-	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]//.map(function(x) {return Math.round(x * 0.75)}); // length / width of head, body, butt, tail
+	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14].map(function(x) {return Math.round(x * 0.5)}); // length / width of head, body, butt, tail
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
 
