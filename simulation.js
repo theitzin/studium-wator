@@ -3,6 +3,8 @@
 SimulationMode = function(width, height) {
 	this.WIDTH  = width;
   	this.HEIGHT = height;
+
+  	this.behaviour;
 };
 
 SimulationMode.prototype.Run = function(ctx) {
@@ -46,9 +48,9 @@ ContinuousWator = function(width, height) {
 
     this.sharks = [];
     this.fishes = [];
+    this.behaviour = new SwarmBehaviour();
 
     this.lastUpdate = Date.now();
-
     this.Init();
 };
 
@@ -101,7 +103,7 @@ ContinuousWator.prototype.FishSwim = function(f,s){
 		var moveY = direction.y * 150 + (Math.round(Math.random())*2-1)*this.CELL;
 
 	    //f[i].UpdatePosition(moveX, moveY);
-	    var move = f[i].nextPosition(f,s);
+	    var move = this.behaviour.NextPosition(f[i], f,s);
 
 	    move.scale(100);
 	    //console.log(move);
@@ -192,15 +194,163 @@ ContinuousWator.prototype.GetRandPos = function(){
 
 // behaviour class
 // provides abstract interface for rule based classic wator behaviour or swarm behaviour
-Behaviour = function () {
-
-}
+Behaviour = function () {};
+Behaviour.prototype.Init = function() {};
+Behaviour.prototype.NextPosition = function(entity, swarm, predators) {};
 
 
 SwarmBehaviour = function() {
-	SimulationMode.apply(this, arguments);
-
-	
-}
-SwarmBehaviour.prototype = Object.create(SimulationMode.prototype);
+	Behaviour.apply(this, arguments);	
+};
+SwarmBehaviour.prototype = Object.create(Behaviour.prototype);
 SwarmBehaviour.prototype.constructor = Behaviour;
+
+SwarmBehaviour.prototype.NextPosition = function(entity, entityList,entityListFlee) {
+	var h = 0.1;
+	var vel = entity.velocity.clone();
+	var pos = entity.position.clone();
+	var f = this.fun(entity, entityList,entityListFlee);
+	entity.velocity.setVec2(entity.velocity.clone().add(f.scale(h)));
+	//console.log(entity.velocity);
+	entity.direction.setVec2(entity.velocity.clone().normalize());
+	vel.scale(h);
+	return vel;
+}
+
+SwarmBehaviour.prototype.fun = function(entity, entityList,entityListFlee) {
+	var alpha = 0.07;
+	var beta = 0.05;
+	var m = 1;
+	var N = entityList.length;
+	var vel = entity.velocity.clone();
+
+	//console.log(vel);
+	var s1 = vel.scale(alpha - beta*vel.length2());
+	var s2 = new Vec2(0,0);
+	//var Bi = entity.B(entityList);
+	var Ri = this.R(entity, entityListFlee).scale(0.5);
+	var Ri2 = this.R(entity, entityList).scale(0.1);
+	Ri.add(Ri2);
+	//var Ai = this.A(entity, entityList).scale(0.3);
+	//var Si = this.S(entity, entityListFlee).scale(10);
+	//console.log(s1,Bi,Ri,Ai);
+	//s1 = s1.add(Ri.add(Ai)).scale(1/m);
+	//Erweiterte Cucker-Smale-Modelle
+		/*
+	// Cucker-Smale Partikel-Modell
+	for(var i = 0; i < N; i++){
+		if(entity.position != entityList[i].position){
+			var vel = entityList[i].direction.clone().sub(entity.direction);
+			var pos = entityList[i].position.clone().sub(entity.position);
+			var r = pos.length()
+			s2 = s2.add(vel.scale(H(r)));
+		}
+	*/
+	//Selbstantriebs, Abbremsungs, und Anziehungs–Abstoßungs-Partikel Modell
+	for(var i = 0; i < N; i++){
+		if(entity.position != entityList[i].position){
+			s2 = s2.add(NablaU(entity.position,entityList[i].position));
+		}
+	}
+	//console.log(s1,s2,Si);
+	//return s2.scale(1/N);
+	return s1.add(Ri.sub(s2));
+}
+
+function H(r){
+	var k = 600;
+	var sigma = 1000;
+	var gamma = 1/20;
+
+	return k/Math.pow(sigma+r*r,gamma);
+}
+
+SwarmBehaviour.prototype.S = function(entity, entityList){
+	var beta1 = 1/100;
+	var N = entityList.length;
+
+	var s = new Vec2(0,0);
+	for(var i = 0; i < N;i++){
+		var r = entity.position.clone().sub(entityList[i].position);
+		var rLen = r.length();
+		var v = entityList[i].velocity.clone().sub(entity.velocity)
+		s = s.add(v.scale(1/(Math.pow(1+rLen,beta1))));
+	}
+	return s.scale(1/N);
+}
+SwarmBehaviour.prototype.R = function(entity, entityList){
+	var rho = 10;
+	var beta1 = 1/5;
+	var d = 200;
+	var N = entityList.length;
+
+	var s = new Vec2(0,0);
+	for(var i = 0; i < N;i++){
+		var r = entity.position.clone().sub(entityList[i].position);
+		var rLen = r.length();
+		s = s.add(r.scale(cutoff(rLen,1,d)/(Math.pow(1+rLen*rLen,beta1))));
+	}
+	return s.scale(rho/N);
+}
+
+SwarmBehaviour.prototype.B = function(entity, entityList){
+	var d = 400;
+	var N = entityList.length;
+	var C = 10;
+
+	var rho = 0;
+	var s = new Vec2(0,0);
+	for(var i = 0; i < N;i++){
+		var r = entity.position.clone().sub(entityList[i].position);
+		var rLen = r.length2();
+		rho = rho + 1/(1+rLen);
+	}
+	rho = rho/N;
+	var l = entity.velocity.length();
+	return entity.velocity.ortho().scale(l*C*(1-cutoff(rho,1,d)));
+}
+function cutoff(x,v,d){
+	return (1-Math.tanh(v*(x-d)))/2;
+}
+
+SwarmBehaviour.prototype.A = function(entity, entityList){
+	var d = 400;
+	var N = entityList.length;
+
+	var s = new Vec2(0,0);
+	for(var i = 0; i < N;i++){
+		var r = entity.position.clone().sub(entityList[i].position);
+		var v = entityList[i].velocity.clone().sub(entity.velocity)
+		var rLen = r.length();
+		var w = wFun(r,entity.velocity.clone());
+		s = s.add(v.scale((1-cutoff(rLen,1,d))*w));
+	}
+
+	return s.scale(1/N);
+}
+
+
+function wFun(x,v){
+	var gamma = 30;
+	var delta = 0.30;
+	var q = 10;
+	var sigma = 0.02;
+
+	var d = 20;
+	var s = gamma/Math.pow(q+x.length2(),sigma);
+	var S1 = cutoff(v.length(),1/d,d);
+	var S2 = 1-cutoff(Math.abs(x.normalize().dot(v.normalize())),1,delta)
+	return s*(S1 + (1-S1)*S2);
+}
+
+function NablaU(x1,x2) {
+	var cA = 100;
+	var cR = 50;
+	var lA = 200;
+	var lR = 100;
+	var r = Math.max(0.000000001,x1.distance(x2));
+
+	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
+	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
+	return new Vec2(dU1, dU2);
+}

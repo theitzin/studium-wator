@@ -114,7 +114,7 @@ Entity.prototype.InterpolationTime = function() {
 	return dt; //1 - (1 - dt)*(1 - dt); //return -2*dt*dt*dt + 3*dt*dt;
 };
 
-Entity.prototype.nextPosition = function(entityList,entityListFlee) {
+Entity.prototype.NextPosition = function(entityList,entityListFlee) {
 	var h = 0.1;
 	var vel = this.velocity.clone();
 	var pos = this.position.clone();
