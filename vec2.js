@@ -52,6 +52,10 @@ Vec2.prototype.equals = function(v, tolerance) {
   return (Math.abs(v.x - this.x) <= tolerance) && (Math.abs(v.y - this.y) <= tolerance);
 };
 
+Vec2.prototype.isZero = function() {
+  return this.x == 0 && this.y == 0;
+};
+
 Vec2.prototype.add = function(v) {
   this.x += v.x;
   this.y += v.y;

@@ -24,26 +24,27 @@ App.Init = function(){
 
     Entity.prototype.CANVAS_WIDTH = this.CANVAS_WIDTH;
     Entity.prototype.CANVAS_HEIGHT = this.CANVAS_HEIGHT;
-    this.SimulationMode = new ContinuousWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    this.SimulationMode = new ClassicWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
 };
 
 App.Run = function(){
 	this.SimulationMode.Run(this.ctx);
+    fixCss();
  	setTimeout("App.Run()", this.INTERVAL);
 };
 
-// fixing canvas size on some aspect ratios
+/*// fixing canvas size on some aspect ratios
 $(document).ready(function () {
     fixCss();
 });
 $(window).resize(function() {
     fixCss();
-});
+});*/
 
 function fixCss() {
     var margin_adjust = $("#margin_adjust");
-    var max_width = $(window).height() - 22;
-    var diff = margin_adjust.width() - max_width;
+    var max_width = $(window).height() - 36;
+    var diff = margin_adjust.outerWidth() - max_width;
     if (diff > 0) {
         $("#margin_adjust").css("padding-left", diff / 2 + "px");
         $("#margin_adjust").css("padding-right", diff / 2 + "px");

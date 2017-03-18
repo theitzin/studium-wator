@@ -1,15 +1,16 @@
-Entity = function(seed, pos) {
+Entity = function(seed, pos, behaviourData) {
 
 	this.position = new Vec2(pos.x, pos.y);
 	this.velocity = new Vec2(0, 0);
 	this.acceleration = new Vec2(0, 0);
 	this.direction = new Vec2(Math.cos(seed*2*Math.PI), Math.sin(seed*2*Math.PI));
 
-	this.interpolatorX = new Interpolator([this.position.x, this.direction.x, 0, this.position.x + this.direction.x, 0]);
-	this.interpolatorY = new Interpolator([this.position.y, this.direction.y, 0, this.position.y + this.direction.y, 0]);
+	this.interpolatorX = new Interpolator([this.position.x, 0.1*this.direction.x, 0, this.position.x + this.direction.x, 0]);
+	this.interpolatorY = new Interpolator([this.position.y, 0.1*this.direction.y, 0, this.position.y + this.direction.y, 0]);
 	this.interpolationStart = Date.now();
 
 	this.animationTime = seed;
+	this.behaviourData = behaviourData;
 
 	// default values, child classes fish and shark implement their own
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7]; // length / width of head, body, butt, tail
@@ -34,6 +35,7 @@ Entity.prototype.Draw = function(ctx) {
 
 	var aTmp = new Vec2(dataX[1] - this.velocity.x, dataY[1] - this.velocity.y);
 	this.acceleration.scale(0.9).add(aTmp.scale(0.1));
+
 	var aTangential = this.acceleration.dot(this.direction);
 	var aNormal = this.acceleration.dot(this.direction.ortho());
 	//this.velocity.set(dataX[1], dataY[1]);
@@ -71,14 +73,16 @@ Entity.prototype.Draw = function(ctx) {
 // now a relative position update!
 Entity.prototype.UpdatePosition = function(x, y) {
 
+	var goalX = this.interpolatorX.GoalValue();
+	var goalY = this.interpolatorY.GoalValue();
 	var dataX = this.interpolatorX.Eval(this.InterpolationTime());
 	var dataY = this.interpolatorY.Eval(this.InterpolationTime());
 
 	var acc = new Vec2(-dataX[2], -dataY[2]);
 	acc.normalize().scale(100);
 
-	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, dataX[0] + x, 0]);
-	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, dataY[0] + y, 0]);
+	this.interpolatorX = new Interpolator([dataX[0], dataX[1], acc.x, goalX + x, 0]);
+	this.interpolatorY = new Interpolator([dataY[0], dataY[1], acc.y, goalY + y, 0]);
 	this.interpolationStart = Date.now();
 };
 
@@ -116,7 +120,7 @@ Entity.prototype.InterpolationTime = function() {
 
 // child classes fish and shark
 
-Fish = function(seed, pos) {
+Fish = function(seed, pos, behaviourData) {
 	Entity.apply(this, arguments);
 
 	this.velocity = new Vec2(0, 0);
@@ -133,15 +137,12 @@ Fish = function(seed, pos) {
 Fish.prototype = Object.create(Entity.prototype);
 Fish.prototype.constructor = Fish;
 
-Shark = function(seed, pos) {
+Shark = function(seed, pos, behaviourData) {
 	Entity.apply(this, arguments);
 
 	this.dimensions = [20, 13, 35, 7, 23, 4, 24, 14]; // length / width of head, body, butt, tail
 	this.colors = ['#9097a0', '#70757c', '#565b63'];
 	this.animationSpeed = 0.1;
-
-	this.spawn = 30; // default TODO FIX App.SimulationMode.SHARKSPAWN;
-	this.starving = 20; // default App.SimulationMode.SHARKSTARVE;
 }
 Shark.prototype = Object.create(Entity.prototype);
 Shark.prototype.constructor = Shark;
@@ -158,6 +159,7 @@ Interpolator = function(data) {
 					[1, 0, 0, 0, 0]];
 
 	this.coef = MatrixVectorMult(inverse, data);
+	this.goalValue = data[3];
 };
 
 Interpolator.prototype.Eval= function(t) {
@@ -165,6 +167,10 @@ Interpolator.prototype.Eval= function(t) {
 			((4*this.coef[0]*t + 3*this.coef[1])*t + 2*this.coef[2])*t + this.coef[3], // velocities
 			(12*this.coef[0]*t + 6*this.coef[1])*t + 2*this.coef[2]]; // curvature
 
+};
+
+Interpolator.prototype.GoalValue = function() {
+	return this.goalValue;
 };
 
 // utility stuff
@@ -179,6 +185,17 @@ function MatrixVectorMult(mat, vec) {
 		result.push(tmp);
 	}
 	return result;
+}
+
+function ZeroInit(n, m) {
+	var matrix = [];
+	for (var i = 0; i < n; i++) {
+		matrix.push([]);
+		for (var j = 0; j < m; j++) {
+			matrix[i].push(0); // not occupied
+		}
+	}
+	return matrix;
 }
 
 // javascript % operator is bullshit - returns crap for negative numbers
