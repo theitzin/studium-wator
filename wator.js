@@ -25,7 +25,7 @@ App.Init = function() {
 
     Entity.prototype.CANVAS_WIDTH = this.CANVAS_WIDTH;
     Entity.prototype.CANVAS_HEIGHT = this.CANVAS_HEIGHT;
-    this.SimulationMode = new ContinuousWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    this.SimulationMode = new ClassicWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
     this.PopulationPlot = new Plot("graph");
 };
 
@@ -47,7 +47,6 @@ App.Run = function() {
 
     var [nfish, nshark] = this.SimulationMode.GetPopulationData();
     this.PopulationPlot.Update(nfish, nshark, this.INTERVAL / 1000);
-    this.PopulationPlot.Relayout();
     fixCss();
  	setTimeout("App.Run()", this.INTERVAL);
 };
@@ -65,3 +64,14 @@ function fixCss() {
         $("#margin_adjust").css("padding-right", 0 + "px");
     }
 }
+
+$(document).ready(function () {
+    fixPlotWidth();
+});
+$(window).resize(function() {
+    fixPlotWidth();
+});
+
+function fixPlotWidth() {
+    App.PopulationPlot.Relayout();
+};
