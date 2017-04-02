@@ -40,12 +40,12 @@ ClassicWator = function(width, height) {
   	this.nshark = this.INITIALSHARK;
   	this.nfish = this.INITIALFISH;
 
-  	this.BACKGROUND_COLOR = "#b4cef7";
   	this.TIMESTEP = 2000;
 
   	this.iteration = 0;
   	this.grid = [];
   	this.behaviour = new RuleBased(this.CELL);
+  	this.voronoi = new Voronoi(this.WIDTH, this.HEIGHT);
 
   	this.Init();
 };
@@ -113,9 +113,7 @@ ClassicWator.prototype.Update = function() {
 };
 
 ClassicWator.prototype.DrawEnvironment = function(ctx) {
-	ctx.fillStyle = this.BACKGROUND_COLOR;
-	ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
-
+	this.voronoi.Draw(ctx);
 	for (var i = 1; i < this.XSTEP; i++) {
 		this.DrawLine(ctx, new Vec2(i * this.CELL, 0), new Vec2(i * this.CELL, this.HEIGHT));
 	}
@@ -148,8 +146,8 @@ ClassicWator.prototype.GetRandomPosition = function() {
 };
 
 ClassicWator.prototype.DrawLine = function(ctx, p1, p2) {
-	ctx.strokeStyle="#808080";
-	ctx.lineWidth = 2;
+	ctx.strokeStyle="#404040";
+	ctx.lineWidth = 0.5;
 	ctx.beginPath();
 	ctx.moveTo(p1.x, p1.y);
 	ctx.lineTo(p2.x, p2.y);
@@ -193,13 +191,12 @@ ContinuousWator = function(width, height) {
     this.SHARKSTARVE  = 6;
     this.SHARKSPAWN  = 10;
     this.FISHSPAWN  = 10;
-		this.FISHAGE = 30;
-
-    this.BACKGROUND_COLOR = "#b4cef7";
+	this.FISHAGE = 30;
 
     this.sharks = [];
     this.fishes = [];
     this.behaviour = new SwarmBehaviour();
+    this.voronoi = new Voronoi(this.WIDTH, this.HEIGHT);
 
     this.Init();
 };
@@ -227,8 +224,7 @@ ContinuousWator.prototype.Update = function() {
 };
 
 ContinuousWator.prototype.DrawEnvironment = function(ctx) {
-	ctx.fillStyle = this.BACKGROUND_COLOR;
-	ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+	this.voronoi.Draw(ctx);
 };
 
 ContinuousWator.prototype.DrawEntities = function(ctx) {
@@ -268,8 +264,6 @@ ContinuousWator.prototype.FishSwim = function(f,s){
       	f[i].behaviourData["spawn"] -= 1;
     }
 		f[i].UpdatePosition(move.x, move.y);
-/*=======
-	*/
 	}
 };
 
@@ -631,4 +625,36 @@ function NablaU(x1,x2) {
 	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
 	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
 	return new Vec2(dU1, dU2);
+};
+
+
+Voronoi = function(width, height) {
+	var sites = d3.range(150).map(function() {
+		return [Math.random() * width, Math.random() * height]; });
+
+	var voronoi = d3.voronoi().extent([[0, 0], [width, height]]);
+	var relaxedSites = voronoi(sites).polygons().map(d3.polygonCentroid);
+	var diagram = voronoi(relaxedSites);
+
+	this.polygons = diagram.polygons();
+	var colorRange = [[0.53, 0.77, 0.94], [0.57, 0.73, 0.7]];
+	this.colors = [];
+	for (var i = 0; i < this.polygons.length; i++) {
+		var t = this.polygons[i][0][0] / 1000;
+		this.colors.push(HSVtoRGB(	colorRange[0][0] + t*(colorRange[1][0] - colorRange[0][0]), 
+									colorRange[0][1] + t*(colorRange[1][1] - colorRange[0][1]),
+									colorRange[0][2] + t*(colorRange[1][2] - colorRange[0][2])));
+	}
+};
+
+Voronoi.prototype.Draw = function(ctx) {
+	for (var i = 0; i < this.polygons.length; i++) {
+		ctx.fillStyle = this.colors[i];
+		ctx.beginPath();
+		if (this.polygons[i].length != 0)
+			ctx.moveTo(this.polygons[i][0][0], this.polygons[i][0][1]);
+		for (var j = 1; j < this.polygons[i].length; j++)
+			ctx.lineTo(this.polygons[i][j][0], this.polygons[i][j][1]);
+		ctx.fill();
+	}
 };
