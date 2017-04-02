@@ -12,6 +12,10 @@ Plot.prototype.Create = function() {
     y: [0],
     type: 'scatter',
     mode: 'lines',
+    line: {
+      color: 'rgb(49, 154, 156)',
+      width: 3
+    },
     name: 'Fishes'
   };
 
@@ -20,6 +24,10 @@ Plot.prototype.Create = function() {
     y: [0],
     type: 'scatter',
     mode: 'lines',
+    line: {
+      color: 'rgb(150, 157, 157)',
+      width: 3
+    },
     name: 'Sharks'
   };
 
@@ -27,7 +35,7 @@ Plot.prototype.Create = function() {
 
   var layout = {
     title: 'Fish/Shark Growth',
-    autosize: true, 
+    autosize: true,
     //width: 400,
     height: 400,
     xaxis: {
