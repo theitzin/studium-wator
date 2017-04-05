@@ -39,6 +39,18 @@ body {
 #container_controls {
 }
 
+.input-group {
+	width: 100px;
+}
+
+.params {
+	display: none;
+}
+
+.visible {
+	display: block;
+}
+
 #container_graph {
 }
 

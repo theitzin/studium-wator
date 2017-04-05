@@ -8,8 +8,8 @@ Plot = function(id) {
 
 Plot.prototype.Create = function() {
   var trace1 = {
-    x: [0],
-    y: [0],
+    x: [],
+    y: [],
     type: 'scatter',
     mode: 'lines',
     line: {
@@ -20,8 +20,8 @@ Plot.prototype.Create = function() {
   };
 
   var trace2 = {
-    x: [0],
-    y: [0],
+    x: [],
+    y: [],
     type: 'scatter',
     mode: 'lines',
     line: {
@@ -46,8 +46,7 @@ Plot.prototype.Create = function() {
     },
     yaxis: {
       title: 'Percent',
-      showline: false,
-      range: [0, 1]
+      showline: false
     }
   };
 

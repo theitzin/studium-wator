@@ -15,6 +15,7 @@ SimulationMode.prototype.Run = function(ctx) {
 		this.Update();
 		this.lastUpdate = now;
 	}
+
 	this.DrawEnvironment(ctx);
 	this.DrawEntities(ctx);
 };
@@ -34,8 +35,8 @@ ClassicWator = function(width, height) {
 	this.CELL  = 50;
   	this.XSTEP  = this.WIDTH / this.CELL;
   	this.YSTEP  = this.HEIGHT / this.CELL;
-  	this.INITIALSHARK  = 10;
-  	this.INITIALFISH  = 30;
+  	this.INITIALSHARK  = parseInt($(".visible input[name=NSHARK]").val());
+  	this.INITIALFISH  = parseInt($(".visible input[name=NFISH]").val());
 
   	this.nshark = this.INITIALSHARK;
   	this.nfish = this.INITIALFISH;
@@ -134,7 +135,7 @@ ClassicWator.prototype.DrawEntities = function(ctx) {
 };
 
 ClassicWator.prototype.GetPopulationData = function() {
-	return [this.nfish / this.XSTEP / this.YSTEP, this.nshark / this.XSTEP / this.YSTEP];
+	return [this.nfish , this.nshark];
 };
 
 
@@ -184,14 +185,15 @@ ContinuousWator = function(width, height) {
   	this.YSTEP  = this.HEIGHT / this.CELL;
     this.TOL  = 40;
     this.TIMESTEP  = 500;
-  	this.NSHARK  = 20;
-  	this.NFISH  = 200;
-    this.MAXFISH  = 500;
-    this.MAXSHARK  = 50;
-    this.SHARKSTARVE  = 6;
-    this.SHARKSPAWN  = 10;
-    this.FISHSPAWN  = 10;
-	this.FISHAGE = 30;
+
+		this.NSHARK  = parseInt($(".visible input[name=NSHARK]").val());
+		this.NFISH  = parseInt($(".visible input[name=NFISH]").val());
+		this.MAXFISH  = parseInt($(".visible input[name=NFISH]").data('max-value'));
+		this.MAXSHARK  = parseInt($(".visible input[name=NSHARK]").data('max-value'));
+		this.SHARKSTARVE  = parseInt($(".visible input[name=SHARKSTARVE]").val());
+		this.SHARKSPAWN  = parseInt($(".visible input[name=SHARKSPAWN]").val());
+		this.FISHSPAWN  = parseInt($(".visible input[name=FISHSPAWN]").val());
+		this.FISHAGE = parseInt($(".visible input[name=FISHAGE]").val());
 
     this.sharks = [];
     this.fishes = [];
@@ -363,9 +365,9 @@ RuleBased = function(cellSize) {
 	Behaviour.apply(this, arguments);
 
 	this.CELLSIZE = cellSize;
-	this.FBRUT = 15;
-	this.HBRUT = 25;
-	this.FASTEN = 15;
+	this.FBRUT = parseInt($(".visible input[name=FISHSPAWN]").val());
+	this.HBRUT = parseInt($(".visible input[name=SHARKSPAWN]").val());
+	this.FASTEN = parseInt($(".visible input[name=SHARKSTARVE]").val());
 
 	this.Init();
 };
@@ -641,7 +643,7 @@ Voronoi = function(width, height) {
 	this.colors = [];
 	for (var i = 0; i < this.polygons.length; i++) {
 		var t = this.polygons[i][0][0] / 1000;
-		this.colors.push(HSVtoRGB(	colorRange[0][0] + t*(colorRange[1][0] - colorRange[0][0]), 
+		this.colors.push(HSVtoRGB(	colorRange[0][0] + t*(colorRange[1][0] - colorRange[0][0]),
 									colorRange[0][1] + t*(colorRange[1][1] - colorRange[0][1]),
 									colorRange[0][2] + t*(colorRange[1][2] - colorRange[0][2])));
 	}

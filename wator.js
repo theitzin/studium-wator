@@ -4,7 +4,7 @@ $(document).ready(function () {
 
 var App = {
   	INTERVAL : 20,
-    PLOT_INTERVAL : 1000, 
+    PLOT_INTERVAL : 1000,
   	CANVAS_WIDTH : 1000,
   	CANVAS_HEIGHT : 1000,
   	CANVAS_ID : "canvas",
@@ -37,16 +37,21 @@ App.InitEvents = function() {
 
         if (value == 1) { // continuous case
             App.SimulationMode = new ContinuousWator(App.CANVAS_WIDTH, App.CANVAS_HEIGHT);
+            App.PopulationPlot = new Plot("graph");
+            Plotly.relayout(App.PopulationPlot.div, {'yaxis.range': [0,1]});
         }
-        else if (value == 2) { // classic case 
+        else if (value == 2) { // classic case
             App.SimulationMode = new ClassicWator(App.CANVAS_WIDTH, App.CANVAS_HEIGHT);
+            App.PopulationPlot = new Plot("graph");
+            Plotly.relayout(App.PopulationPlot.div, {'yaxis.autorange': true});
         }
+
     });
 };
 
 App.Run = function() {
 	this.SimulationMode.Run(this.ctx);
-    fixCss();
+  fixCss();
  	setTimeout("App.Run()", this.INTERVAL);
 };
 
