@@ -39,23 +39,9 @@
           <div id="container_graph" class="container_wrapper text_wrapper">
             <h4>Populations</h4>
             <div id="graph"></div>
-            <!-- <script type="text/javascript" src="plot.js"></script> -->
           </div>
         </div>
 
-        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
-          <div id="container_about" class="container_wrapper text_wrapper">
-            <h4>About Wator</h4>
-
-            <p>
-            The balance of this ecosystem is very delicate: the populations of two species can follow hugely different cycles depending on the given parameters (such as reproduction cycles and the time period in which a shark must eat to avoid starvation) as well as starting positions of each being. We may go from both species being endangered to an abundance of one or both.
-            <br><br>
-            When the prey are numerous, predators can reproduce rapidly. But this increase in turn increases the number of prey hunted and the population of the prey decreases. By becoming rarer prey, predators begin to starve and die of starvation, decreasing their population and easing the pressure on hunting prey. The prey (and in time predator) can then go back to rapidly reproducing as the cycle repeats itself.
-            </p>
-            <a id="documentation_link" href="url">Documentation</a>
-          </div>
-        </div>
-        <div class="clearfix visible-lg"></div>
         <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
           <div id="container_controls" class="container_wrapper text_wrapper">
             <h4>Controls</h4>
@@ -81,6 +67,8 @@
 
             <div class="form-group params visible" id="classic-controls">
               <div class="col-sm-6 col-md-6">
+                <label for="NCELLS">Number of cells:</label>
+                <input type="text" class="form-control touchspin input-sm" data-max-value="50" data-min-value="1" data-initval="20" data-step="1" name="NCELLS">
                 <label for="NFISH">Number of fishes:</label>
                 <input type="text" class="form-control touchspin input-sm" data-max-value="250" data-initval="150" data-step="10" name="NFISH">
                 <label for="FISHSPAWN">Timesteps until fishes spawn:</label>
@@ -95,29 +83,48 @@
                 <input type="text" class="form-control touchspin input-sm" data-max-value="50" data-initval="10" data-step="1" name="SHARKSTARVE">
               </div>
             </div>
+
+            <div class="form-group params visible" id="pet-controls">
+              <div class="col-sm-6 col-md-6">
+              </div>
+              <div class="col-sm-6 col-md-6">
+              </div>
+            </div>
+
             <div class="col-sm-12"></br></div>
             <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-primary" id="ContinuousWator">
-                <input type="radio" name="simulationMode" value="1" autocomplete="off"> Continuous Wator
+              <label class="btn btn-primary active" id="ContinuousWator">
+                <input type="radio" name="simulationMode" value="1" autocomplete="off" checked> Continuous
               </label>
-              <label class="btn btn-primary active" id="ClassicWator">
-                <input type="radio" name="simulationMode" value="2" autocomplete="off" checked> Classic Wator
+              <label class="btn btn-primary" id="ClassicWator">
+                <input type="radio" name="simulationMode" value="2" autocomplete="off"> Classic
+              </label>
+              <label class="btn btn-primary" id="PetWator">
+                <input type="radio" name="simulationMode" value="3" autocomplete="off"> Pet
               </label>
             </div>
-            <button id="reset_button" type="button" class="btn btn-primary">Reset</button>
             <button id="reset_params" type="button" class="btn btn-primary">Reset parameters</button>
+            <button id="reset_button" type="button" class="btn btn-primary">Apply</button>
           </div>
         </div>
 
         <script>
         $("#ContinuousWator").click(function (){
           $("#classic-controls").removeClass("visible");
+          $("#pet-controls").removeClass("visible");
           $("#continuous-controls").addClass("visible");
         })
 
         $("#ClassicWator").click(function (){
           $("#continuous-controls").removeClass("visible");
+          $("#pet-controls").removeClass("visible");
           $("#classic-controls").addClass("visible");
+        })
+
+        $("#PetWator").click(function (){
+          $("#continuous-controls").removeClass("visible");
+          $("#classic-controls").removeClass("visible");
+          $("#pet-controls").addClass("visible");
         })
 
         $.each($('.touchspin'), function() {
@@ -139,6 +146,21 @@
           })
         });
         </script>
+
+        <div class="clearfix visible-lg"></div>
+        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+          <div id="container_about" class="container_wrapper text_wrapper">
+            <h4>About Wator</h4>
+
+            <p>
+            The balance of this ecosystem is very delicate: the populations of two species can follow hugely different cycles depending on the given parameters (such as reproduction cycles and the time period in which a shark must eat to avoid starvation) as well as starting positions of each being. We may go from both species being endangered to an abundance of one or both.
+            <br><br>
+            When the prey are numerous, predators can reproduce rapidly. But this increase in turn increases the number of prey hunted and the population of the prey decreases. By becoming rarer prey, predators begin to starve and die of starvation, decreasing their population and easing the pressure on hunting prey. The prey (and in time predator) can then go back to rapidly reproducing as the cycle repeats itself.
+            </p>
+            <a id="documentation_link" href="url">Documentation</a>
+          </div>
+        </div>
+
         <div id="container_end" class="col-sm-12 col-md-12 col-lg-12 col-xl-12"></div>
       </div>
     </div>

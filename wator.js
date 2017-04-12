@@ -11,13 +11,12 @@ var App = {
 };
 
 App.Start = function() {
-	canvas = document.getElementById(this.CANVAS_ID);
+	this.canvas = document.getElementById(this.CANVAS_ID);
     this.ctx = canvas.getContext('2d');
 
   	App.Init();
     App.InitEvents();
 	App.Run();
-    App.PlotUpdate();
 };
 
 App.Init = function() {
@@ -27,7 +26,7 @@ App.Init = function() {
 
     Entity.prototype.CANVAS_WIDTH = this.CANVAS_WIDTH;
     Entity.prototype.CANVAS_HEIGHT = this.CANVAS_HEIGHT;
-    this.SimulationMode = new ClassicWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    this.SimulationMode = new ContinuousWator(this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
     this.PopulationPlot = new Plot("graph");
 };
 
@@ -38,12 +37,26 @@ App.InitEvents = function() {
         if (value == 1) { // continuous case
             App.SimulationMode = new ContinuousWator(App.CANVAS_WIDTH, App.CANVAS_HEIGHT);
             App.PopulationPlot = new Plot("graph");
-            Plotly.relayout(App.PopulationPlot.div, {'yaxis.range': [0,1]});
+            App.PopulationPlot.Relayout({
+                'yaxis.range': [0,1], 
+                'xaxis.title': 'Relative population count over time'
+            });
         }
         else if (value == 2) { // classic case
             App.SimulationMode = new ClassicWator(App.CANVAS_WIDTH, App.CANVAS_HEIGHT);
             App.PopulationPlot = new Plot("graph");
-            Plotly.relayout(App.PopulationPlot.div, {'yaxis.autorange': true});
+            App.PopulationPlot.Relayout({
+                'yaxis.autorange': true, 
+                'xaxis.title': 'Population count over time'
+            });
+        }
+        else if (value == 3) { // pet mode
+            App.SimulationMode = new PetWator(App.CANVAS_WIDTH, App.CANVAS_HEIGHT);
+            App.PopulationPlot = new Plot("graph");
+            App.PopulationPlot.Relayout({
+                'yaxis.autorange': true, 
+                'xaxis.title': 'No data'
+            });
         }
 
     });
@@ -51,14 +64,8 @@ App.InitEvents = function() {
 
 App.Run = function() {
 	this.SimulationMode.Run(this.ctx);
-  fixCss();
+    fixCss();
  	setTimeout("App.Run()", this.INTERVAL);
-};
-
-App.PlotUpdate = function() {
-    var [nfish, nshark] = this.SimulationMode.GetPopulationData();
-    this.PopulationPlot.Update(nfish, nshark, this.PLOT_INTERVAL / 1000);
-    setTimeout("App.PlotUpdate()", this.PLOT_INTERVAL);
 };
 
 function fixCss() {
@@ -83,5 +90,5 @@ $(window).resize(function() {
 });
 
 function fixPlotWidth() {
-    App.PopulationPlot.Relayout();
+    App.PopulationPlot.Relayout({});
 };

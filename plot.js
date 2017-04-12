@@ -34,19 +34,28 @@ Plot.prototype.Create = function() {
   var data = [trace1, trace2];
 
   var layout = {
-    title: 'Fish/Shark Growth',
     autosize: true,
-    //width: 400,
-    height: 400,
+    height: 300,
     xaxis: {
-      title: 'Time',
+      title: 'Relative population count over time',
       showgrid: false,
       zeroline: false,
       range: [0, 50]
     },
     yaxis: {
-      title: 'Percent',
       showline: false
+    },
+    legend: {
+      xanchor: 'right',
+      x: 1,
+      y: 1.2,
+      orientation: 'h'
+    },
+    margin: {
+      l: 25,
+      r: 10,
+      t: 0,
+      b: 50
     }
   };
 
@@ -72,6 +81,6 @@ Plot.prototype.Update = function(fishValue, sharkValue, dt) {
   Plotly.restyle(this.div, update);
 };
 
-Plot.prototype.Relayout = function() {
-  Plotly.relayout(this.div, {});
+Plot.prototype.Relayout = function(data) {
+  Plotly.relayout(this.div, data);
 };
