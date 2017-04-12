@@ -52,8 +52,8 @@ Plot.prototype.Create = function() {
       orientation: 'h'
     },
     margin: {
-      l: 25,
-      r: 10,
+      l: 35,
+      r: 15,
       t: 0,
       b: 50
     }
