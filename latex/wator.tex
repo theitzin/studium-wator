@@ -5,7 +5,7 @@
 
 \usepackage{fullpage}
 \usepackage[utf8]{inputenc}
-\usepackage[german]{babel}
+\usepackage[ngerman]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -17,15 +17,19 @@
 \usepackage[babel=true]{microtype} % sexy micro typesetting
 %\usepackage{hyperref} % create URLs and clickable refs
 %\usepackage{titling} % custom titling
+\usepackage{epigraph}
+\setlength{\epigraphwidth}{.8\textwidth}
+\usepackage{float}
 
 % --------------------------------------------------------------------
 % Definitions
 % --------------------------------------------------------------------
 \newcommand{\R}{\ensuremath{\mathbb{R}}}   % reelle Zahlen
 \newcommand{\C}{\ensuremath{\mathbb{C}}}   % complexe Zahlen
-\newcommand{\N}{\ensuremath{\mathbb{N}}}   % natrürliche Zahlen
+\newcommand{\N}{\ensuremath{\mathbb{N}}}   % natürliche Zahlen
 \newcommand{\iu}{{i\mkern1mu}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert_2}
+\newcommand{\wator}{\textsc{Wator }}
 
 \newcommand{\comment}[1]{\textbf{\textcolor{blue}{#1}}\newline}
 
@@ -55,9 +59,9 @@
 % Metadata
 % --------------------------------------------------------------------
 	\title{ \normalsize \textsc{Biomathematisches Praktikum am PC 2017}    % Subtitle
-            \\[2.0cm]                   % 2cm spacing
+            \\[3.0cm]                   % 2cm spacing
             \HRule{1pt} \\ [0.5cm]      % Upper rule + 0.5cm spacing
-            \LARGE \textbf{\uppercase{Simulation des Wa-Tor Räuber-Beute Modells und Erweiterungen}}    % Title
+            \LARGE \textbf{\uppercase{Simulation des WATOR Räuber-Beute Modells und Erweiterungen}}    % Title
             \HRule{1pt} \\ [0.5cm]      % Lower rule + 0.5cm spacing
             \normalsize \today          % Todays date
         }
@@ -84,73 +88,41 @@
 % --------------------------------------------------------------------
 % Contents
 % --------------------------------------------------------------------
-	\tableofcontents
-	\newpage
+	%\tableofcontents
+	%\newpage
 	
 % --------------------------------------------------------------------
 % Begin Document
 % --------------------------------------------------------------------
-	\section{Das klassische Wa-Tor Programm}
+	\epigraph{
+		Somewhere, in a direction that can only be called recreational at a distance limited only by one's programming prowess, the planet \wator swims among the stars. It is shaped like a torus, or doughnut, and is entirely covered with water. The two dominant denizens of Wa-Tor are sharks and fish, so called because these are the terrestrial creatures they most closely resemble. The sharks of Wa-Tor eat the fish and the fish of Wa-Tor seem always to be in plentiful supply.
+	}{\textit{Alexander Keewatin Dewdney 1984}}
 
-	\section{Das stetige Wa-Tor Programm}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=1\textwidth]{pictures/encounter.png}
+		\label{fig:encounter}
+	\end{figure}
+
+	\section{Das klassische WATOR Programm}
+
+	Das \wator Programm (abgeleitet von Water-Torus) beschreibt ein einfaches Räuber-Beute Modell, die Beute - in unserem Fall Fische haben immer ausreichend Futter und keine natürliche Sterberate. Einzig die Räuber - in unserem Fall Haie können ihnen gefährlich werden, diese können ohne Fische als Nahrungsquelle nicht überleben und würden nach kurzer Zeit aussterben. \newline
+
+	Wäre das auch schon das ganze Modell, so könnte man diese Zusammenhänge durch die klassischen Lotka-Volterra Gleichungen beschreiben
+	\begin{align} \label{eq:lotka_volterra}
+		x_B'(t) &= x_B(t) \left(\alpha - \beta x_R(t)\right) \\
+		x_R'(t) &= x_R(t) \left(\gamma x_B(t) - \delta\right) \nonumber
+	\end{align}
+
+	Das Wachstum der Beute $b(t)$ ist abhängig von der aktuellen Beutepopulation, sowie auf positive Weise von der Reproduktionsrate $\alpha > 0$, und negativ durch die von den Räuber verursachte Sterberate $\beta > 0$. Ganz ähnlich ist das zeitliche Verhalten der Räuberpopulation proportional zur Fressrate pro Beutelebewesen $\gamma > 0$ und zur natürlichen Sterberate $\delta > 0$ wenn keine Beute vorhanden ist. \newline
+
+	Das \wator-Programm will die Sache jedoch genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort im \wator Gebiet, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. \newline
+	Das \wator-Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai in einer Zelle am rechten Rand, der nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht.
+
+	\section{Das stetige WATOR Programm}
 	\subsection{Schwarmverhalten}
 
 	\section{Animationen}
-
-	\section{Helmholtz Equation}
-	
-	\subsection{General}
-	
-	The Helmholtz equation is a partial differential equation of elliptic type. 
-	
-	\begin{alignat}{2} \label{eq:helmholtz}
-		\nabla^2 u + \kappa^2 u \enspace &&= \enspace 0 \\
-		\textnormal{or} \quad \Delta u + \kappa^2 u \enspace &&= \enspace 0 \nonumber
-	\end{alignat}
-	where $\Delta$ is the Laplace Operator with $ \Delta u := \sum_{i=1}^{d} \frac{\partial^2 u}{\partial x_i^2}$. \newline
-	
-	\begin{figure}
-		\centering
-		\includegraphics[width=1\textwidth]{pictures/wator.png}
-		\label{fig:helmholtz}
-		%\caption{Solution to Helmholtz equation}
-	\end{figure}
-	
-	We are interested in radial symmetric solutions to the Helmholtz equation. In order to find them it is helpful to transform equation (\ref{fig:helmholtz}) into polar coordinates for the two dimensional case or spherical coordinates for the three dimensional case. 
-	
-	\begin{lemma} \label{lemma:laplace}
-		The Laplace operator in $\R^2$ is given by $\Delta u = \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}$. The Cartesian coordinates can be represented by polar coordinates as follows: 
-		\begin{align*}
-			\begin{cases}
-				x = r \cos \theta \\
-				y = r \sin \theta
-			\end{cases}
-		\end{align*}
-		Using these substitutions it can be shown that:
-		\begin{align*}
-			\Delta u = \frac{\partial^2 u}{\partial r^2} + \frac{1}{r} \frac{\partial u}{\partial r} + \frac{1}{r^2} \frac{\partial^2 u}{\partial \theta^2}
-		\end{align*}
-		Similarly, in $\R^3$ we transform to a spherical coordinate system:
-		\begin{align*}
-			\begin{cases}
-				x = r \sin \theta \cos \varphi \\
-				y = r \sin \theta \sin \varphi \\
-				z = r \cos \theta
-			\end{cases}
-		\end{align*}
-		which yields the form:
-		\begin{align}
-			\Delta u = \frac{1}{r^2} \frac{\partial}{\partial r} \left( r^2 \frac{\partial u}{\partial r} \right) + \frac{1}{r^2 \sin \theta} \frac{\partial}{\partial \theta} \left( \sin \theta \frac{\partial u}{\partial \theta} \right) + \frac{1}{r^2 \sin^2 \theta} \frac{\partial^2 u}{\partial \varphi^2}
-		\end{align}
-	\end{lemma}
-	%\begin{proof}
-	%	\comment{probably not interesting enough}
-	%\end{proof}
-	\vspace{5mm}
-	
-	Helmholtz' equation is obtained by adding the term $\kappa^2 u$. Since we are solely interested in radial symmetric solutions we would like to eliminate the angular variables $\theta$ and $\varphi$ from the equation. This leads us to:
-
-	
 % Figures
 	
 	\listoffigures
