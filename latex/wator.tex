@@ -20,6 +20,7 @@
 \usepackage{epigraph}
 \setlength{\epigraphwidth}{.8\textwidth}
 \usepackage{float}
+\usepackage{todonotes}
 
 % --------------------------------------------------------------------
 % Definitions
@@ -30,8 +31,6 @@
 \newcommand{\iu}{{i\mkern1mu}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert_2}
 \newcommand{\wator}{\textsc{Wator }}
-
-\newcommand{\comment}[1]{\textbf{\textcolor{blue}{#1}}\newline}
 
 %\theoremstyle{plain}
 \newtheorem{theorem}{Satz}[section] % reset theorem numbering for each chapter
@@ -106,9 +105,7 @@
 
 	\section{Das klassische WATOR Programm}
 
-	Das \wator Programm (abgeleitet von Water-Torus) beschreibt ein einfaches Räuber-Beute Modell, die Beute - in unserem Fall Fische haben immer ausreichend Futter und keine natürliche Sterberate. Einzig die Räuber - in unserem Fall Haie können ihnen gefährlich werden, diese können ohne Fische als Nahrungsquelle nicht überleben und würden nach kurzer Zeit aussterben. \newline
-
-	Wäre das auch schon das ganze Modell, so könnte man diese Zusammenhänge durch die klassischen Lotka-Volterra Gleichungen beschreiben
+	Das \wator Programm (abgeleitet von Water-Torus) beschreibt ein einfaches Räuber-Beute Modell, die Beute - in unserem Fall Fische haben immer ausreichend Futter und keine natürliche Sterberate. Einzig die Räuber - in unserem Fall Haie können ihnen gefährlich werden, diese können ohne Fische als Nahrungsquelle nicht überleben und würden nach kurzer Zeit aussterben. Wäre das auch schon das ganze Modell, so könnte man diese Zusammenhänge durch die klassischen Lotka-Volterra Gleichungen beschreiben
 	\begin{align} \label{eq:lotka_volterra}
 		x_B'(t) &= x_B(t) \left(\alpha - \beta x_R(t)\right) \\
 		x_R'(t) &= x_R(t) \left(\gamma x_B(t) - \delta\right) \nonumber
@@ -116,8 +113,12 @@
 
 	Das Wachstum der Beute $b(t)$ ist abhängig von der aktuellen Beutepopulation, sowie auf positive Weise von der Reproduktionsrate $\alpha > 0$, und negativ durch die von den Räuber verursachte Sterberate $\beta > 0$. Ganz ähnlich ist das zeitliche Verhalten der Räuberpopulation proportional zur Fressrate pro Beutelebewesen $\gamma > 0$ und zur natürlichen Sterberate $\delta > 0$ wenn keine Beute vorhanden ist. \newline
 
-	Das \wator-Programm will die Sache jedoch genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort im \wator Gebiet, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. \newline
-	Das \wator-Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai in einer Zelle am rechten Rand, der nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht.
+	Wir wollen die Sache jedoch ein wenig genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort auf \wator, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. Das \wator Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai der sich etwa in einer Zelle am rechten Rand befindet und nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht. Die Zeit vergeht in diskreten Zeitabschnitten die Chronen genannt werden, und jeder Fisch oder Hai darf sich pro Chrone um eine Zelle entweder nach Norden, Osten, Süden oder Westen bewegen. Falls jedoch bereits alle benachbarten Zellen durch die eigene Spezies besetzt sind, so entfällt diese Regeln. Die Wahl der Bewegungsrichtung ist für Fisch ganz einfach: Wähle zufällig. Haie haben aufgrund ihrer Natur als Jäger jedoch ein wenig mehr zu beachten. Es gilt: Befindet sich in einer benachbarte Zellen ein oder mehrere Fische, so wähle eine dieser Zellen und bewege dich dort hin -- der Fisch wird dabei gefressen. Falls diese Regel nicht anwendbar ist, so verhalte dich wie ein Fisch und wähle zufällig. \newline
+
+	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben.
+
+	\missingfigure{Bewegungsrichtung }
+	\todo{nfish nshark}
 
 	\begin{figure}
 		\centering
