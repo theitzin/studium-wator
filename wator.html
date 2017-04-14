@@ -15,7 +15,6 @@
       <script src="bootstrap/jquery.bootstrap-touchspin.js"></script>
       <script src="http://www.virtuosoft.eu/code/bootstrap-touchspin/bootstrap-touchspin/v2.3.0/bootstrap.touchspin.js"></script>
 
-
       <link rel="stylesheet" type="text/css" href="wator.css">
     	<script type="text/javascript" src="wator.js"></script>
     	<script type="text/javascript" src="fish.js"></script>
@@ -45,6 +44,21 @@
         <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
           <div id="container_controls" class="container_wrapper text_wrapper">
             <h4>Controls</h4>
+
+            <div id="modes">
+              <label id="modelabel">Simulation Mode: </label>
+              <div class="btn-group" data-toggle="buttons" id="modesgroup"> 
+                <label class="btn btn-primary active" id="ContinuousWator">
+                  <input type="radio" name="simulationMode" value="1" autocomplete="off" checked> Continuous
+                </label>
+                <label class="btn btn-primary" id="ClassicWator">
+                  <input type="radio" name="simulationMode" value="2" autocomplete="off"> Classic
+                </label>
+                <label class="btn btn-primary" id="PetWator">
+                  <input type="radio" name="simulationMode" value="3" autocomplete="off"> Pet
+                </label>
+              </div>
+            </div>
 
             <div class="form-group params visible" id="continuous-controls">
               <div class="col-sm-6 col-md-6">
@@ -92,17 +106,6 @@
             </div>
 
             <div class="col-sm-12"></br></div>
-            <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-primary active" id="ContinuousWator">
-                <input type="radio" name="simulationMode" value="1" autocomplete="off" checked> Continuous
-              </label>
-              <label class="btn btn-primary" id="ClassicWator">
-                <input type="radio" name="simulationMode" value="2" autocomplete="off"> Classic
-              </label>
-              <label class="btn btn-primary" id="PetWator">
-                <input type="radio" name="simulationMode" value="3" autocomplete="off"> Pet
-              </label>
-            </div>
             <button id="reset_params" type="button" class="btn btn-primary">Reset parameters</button>
             <button id="reset_button" type="button" class="btn btn-primary">Apply</button>
           </div>
