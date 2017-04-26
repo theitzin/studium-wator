@@ -10,15 +10,18 @@ SimulationMode = function(width, height) {
 };
 
 SimulationMode.prototype.Run = function(ctx) {
-	var now = Date.now();
-	if (now - this.lastUpdate > this.TIMESTEP) {
-		this.Update();
-		this.UpdatePlot();
-		this.lastUpdate = now;
-	}
+	var that = $("#play_pause_button .glyphicon");
+	if(that.hasClass("glyphicon-pause")){
+		var now = Date.now();
+		if (now - this.lastUpdate > this.TIMESTEP) {
+			this.Update();
+			this.UpdatePlot();
+			this.lastUpdate = now;
+		}
 
-	this.DrawEnvironment(ctx);
-	this.DrawEntities(ctx);
+		this.DrawEnvironment(ctx);
+		this.DrawEntities(ctx);
+}
 };
 
 SimulationMode.prototype.Init = function() {};
@@ -36,7 +39,7 @@ ClassicWator = function(width, height) {
   	this.NCELLS = parseInt($(".visible input[name=NCELLS").val());
   	this.CELL = this.WIDTH / this.NCELLS; // assuming width = height
   	this.INITIALFISH = Math.min(
-  		parseInt($(".visible input[name=NFISH]").val()), 
+  		parseInt($(".visible input[name=NFISH]").val()),
   		this.NCELLS * this.NCELLS);
   	this.INITIALSHARK = Math.min(
   		parseInt($(".visible input[name=NSHARK]").val()),
@@ -63,7 +66,7 @@ ClassicWator.prototype.Init = function() {
 	it = new RandomIterator(this.NCELLS * this.NCELLS);
 	for (var cnt = 0, k = it.Next(); cnt < this.INITIALFISH; cnt++, k = it.Next()) {
 		[i, j] = [k % this.NCELLS, Math.floor(k / this.NCELLS)];
-		
+
 		canvasPosition = new Vec2(i, j).scale(this.CELL).addXY(this.CELL / 2, this.CELL / 2);
 		behaviourData = { "age" : Math.floor(Math.random() * this.behaviour.FBRUT), "iteration" : 0 };
 		this.grid[i][j] = new Fish(canvasPosition, behaviourData);
@@ -71,7 +74,7 @@ ClassicWator.prototype.Init = function() {
 
 	for (var cnt = 0; cnt < this.INITIALSHARK; cnt++, k = it.Next()) {
 		[i, j] = [k % this.NCELLS, Math.floor(k / this.NCELLS)];
-		
+
 		canvasPosition = new Vec2(i, j).scale(this.CELL).addXY(this.CELL / 2, this.CELL / 2);
 		behaviourData = { "age" : Math.floor(Math.random() * this.behaviour.HBRUT), "fasten" : 0, "iteration" : 0 };
 		this.grid[i][j] = new Shark(canvasPosition, behaviourData);
@@ -237,8 +240,8 @@ ContinuousWator.prototype.DrawEntities = function(ctx) {
 
 ContinuousWator.prototype.UpdatePlot = function() {
 	App.PopulationPlot.Update(
-		this.fishes.length / this.MAXFISH, 
-		this.sharks.length / this.MAXSHARK, 
+		this.fishes.length / this.MAXFISH,
+		this.sharks.length / this.MAXSHARK,
 		this.TIMESTEP / 1000);
 };
 
@@ -352,7 +355,7 @@ ContinuousWator.prototype.GetRandPos = function() {
 };
 
 
-// pet mode 
+// pet mode
 //
 PetWator = function(width, height) {
 	SimulationMode.apply(this, arguments);
@@ -391,7 +394,7 @@ PetWator.prototype.Update = function() {
 
 	if (this.mousePosition.distance(goal) > 5) {
 		this.fish.UpdatePosition(
-			this.mousePosition.x - goal.x, 
+			this.mousePosition.x - goal.x,
 			this.mousePosition.y - goal.y);
 	}
 };

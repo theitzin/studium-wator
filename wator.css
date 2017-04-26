@@ -89,6 +89,10 @@ body {
 	text-align: right;
 }
 
-#reset_button {
+#reset_button, #play_pause_button {
 	float: right;
+}
+
+#play_pause_button {
+	margin-right: 5px;
 }

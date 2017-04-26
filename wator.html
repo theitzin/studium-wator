@@ -47,7 +47,7 @@
 
             <div id="modes">
               <label id="modelabel">Simulation Mode: </label>
-              <div class="btn-group" data-toggle="buttons" id="modesgroup"> 
+              <div class="btn-group" data-toggle="buttons" id="modesgroup">
                 <label class="btn btn-primary active" id="ContinuousWator">
                   <input type="radio" name="simulationMode" value="1" autocomplete="off" checked> Continuous
                 </label>
@@ -108,6 +108,7 @@
             <div class="col-sm-12"></br></div>
             <button id="reset_params" type="button" class="btn btn-primary">Reset parameters</button>
             <button id="reset_button" type="button" class="btn btn-primary">Apply</button>
+            <button id="play_pause_button" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
           </div>
         </div>
 
@@ -128,6 +129,17 @@
           $("#continuous-controls").removeClass("visible");
           $("#classic-controls").removeClass("visible");
           $("#pet-controls").addClass("visible");
+        })
+
+        $("#play_pause_button").click(function (){
+          var that = $("#play_pause_button .glyphicon");
+          if(that.hasClass("glyphicon-play")){
+            that.removeClass("glyphicon-play");
+            that.addClass("glyphicon-pause");
+          } else {
+            that.removeClass("glyphicon-pause");
+            that.addClass("glyphicon-play");
+          }
         })
 
         $.each($('.touchspin'), function() {
