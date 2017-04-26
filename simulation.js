@@ -565,6 +565,7 @@ SwarmBehaviour.prototype.fun = function(entity, entityList,entityListFlee) {
 	var s2 = new Vec2(0,0);
 	var Ri = this.R(entity, entityListFlee);
 	var Ri2 = this.R(entity, entityList);
+	//Ri2 = new Vec2(0,0);
 	Ri.add(Ri2);
 
 	//var Ai = this.A(entity, entityList);
@@ -677,11 +678,16 @@ function wFun(x,v){
 };
 
 function NablaU(x1,x2) {
+	//var cA = 20;
+	//var cR = 30;
+	//var lA = 50;
+	//var lR = 20;
+	//var r = Math.max(0.00001,x1.distance(x2));
 	var cA = 100;
 	var cR = 50;
 	var lA = 200;
 	var lR = 100;
-	var r = Math.max(0.00000000001,x1.distance(x2));
+	var r = Math.max(0.00001,x1.distance(x2));
 
 	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
 	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
