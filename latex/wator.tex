@@ -9,6 +9,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{mathtools}
 \usepackage{listings}
 \usepackage{mathrsfs}
 \usepackage{graphicx}
@@ -152,7 +153,56 @@
 	\end{figure}
 
 	\section{Das stetige WATOR Programm}
+	Im ersten Schritt ließen wir die Bewohner auf einem vordefinierten festen Gitter schwimmen. Das führt allerdings dazu, dass es eine vom Gitter induzierte natürliche Beschränkung für die Anzahl an Bewohnern gibt. Die Populationsschwankung ist somit eingeschränkt und stößt fast immer an ihre Grenzen. Ziel ist es also eine stabile Räuber-Beute-Beziehung zu modellieren, bei der im Idealfall niemand ausstirbt und die Populationsschwankung nur in Ausnahmefällen künstlich beschränkt wird.
+	Dazu verringern wir die Gitterbreite auf ein Minimum. Somit schwimmen die Bewohner nun auf den einzelnen Pixel. Zusätzlich lassen wir zu, dass sich die Bewohner auch zur gleichen Zeit auf den selben Koordinaten befinden können.
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth]{pictures/continuous.png}
+		\label{fig:encounter}
+		\caption{Das stetige \wator}
+	\end{figure}
+	Diese Anpassung bringt aber einige Probleme mit sich, wie man schnell bemerkt.\newline
+	
+	Zunächst würden Haie nun aussterben, suchten sie nur auf den benachbarten Pixeln nach Nahrung, Sie wären also sozusagen blind und würden erst dann einen Fisch fressen, wenn er sie berührt. Deshalb definieren wir eine Suchtoleranz, sodass Haie nach Fischen suchen, die sich innerhalb dieser befinden. Findet ein Hai zum gegebenen Chrone Fische, welche sich in dieser Umgebung aufhalten, so wählt er einen dieser Fische zufällig aus und macht ihn zu seiner Nahrung.\newline
+	
+	Ein weiteres Problem stellen die Bewegungsabläufe dar. Zuvor ließen wir die Bewohner zufällig in eine der vier Himmelsrichtungen schwimmen. Beim stetigen \wator haben wir aber weit mehr mögliche Schwimmrichtungen. Man könnte als erstes versuchen für jedes Tier in jedem Schritt eine gleichverteilte Zufallszahl zu erzeugen, welche den Winkel der Schwimmrichtung bestimmt.
+	Lässt man die Simulation nun mit diesen Änderungen laufen, so sieht das Ergebnis äußerst ernüchternd aus.
+	Sowohl die Haie als auch die Fische schwimmen orientierungslos umher und bewegen sich eher wie die Nadel eines Kompasses, die von einem Magneten gestörter wird. 
+	Damit diese unnatürlichen Bewegungen vermieden werden, könnte man zum Beispiel die neue Schwimmrichtung so wählen, dass sie einen zufällig gewählten aber beschränkten Winkel mit der alten Schwimmrichtung einschließt.\newline
+	
+	Allerdings waren wir nach all diesen Nachbesserungen immer noch nicht zufrieden. Die Fische schwammen jetzt zwar natürlicher aber dennoch sahen sie recht verloren und orientierungslos aus. Wir wollten jedoch einen Schritt weiter gehen und die Simulation so realistisch wie möglich machen. Also implementierten wir ein Schwarmverhalten für die Fische, um sie mit ein wenig mehr Intelligenz zu versehen.
+	
 	\subsection{Schwarmverhalten}
+Als Modell für das Schwarmverhalten nahmen wir das verfeinerte Cucker-Smale \cite{agueh2011analysis}.
+Die Bewegungsänderung für jedes Individuum wird dabei durch ein System von nichtlinearen Differentialgleichungen beschrieben.
+	\begin{align*}
+		\frac{d}{dt}x_i &= v_i\\
+		\frac{d}{dt}v_i &= R^f_i + R^s_i + A_i  + B_i + (\alpha - \beta |v_i|^2)v_i,
+	\end{align*}
+	wobei $R^f_i$ der Abstoßungsterm für das $i$-te Individuum von den anderen Fischen, $R^s_i$ der Abstoßungsterm für das $i$-te Individuum von den Haien, $A_i$ der Anziehungsterm für das $i$-te Individuum zu den anderen Fischen, $B_i$ die Randkraft für jedes Individuum und letzter Term die Eigenantriebskraft des jeweiligen Individuums ist. \newline
+	Genauer:
+	\begin{align*}
+		R^{f,s}_i &\coloneqq \frac{\rho}{N}\sum^N_{j=1} S_0(|x_i-x_j|, k_{f,s}, d_{f,s})\frac{x_i-x_j}{\left(1+|x_i-x_j|^2\right)^{\gamma}},
+	\end{align*}
+	wobei $\rho$ und $\gamma$ die Stärke der Abstoßung bestimmen und mit einer Cutoff Funktion für die Distanz
+	\begin{align*}
+		S_0(x, k, d) \coloneqq \frac{1}{2}(1-\tanh(k(x-d))),
+	\end{align*}
+wobei $d$ die Position und $k$ die Schärfe des Cutoffs bestimmt. Weiters ist der Anziehungsterm
+\begin{align*}
+		A_i &\coloneqq \frac{1}{N}\sum^N_{j = 1} (1-S_0(|x_i - x_j|))w(x_i - x_j, v_i)(x_j - x_i), 
+	\end{align*}
+	mit Positions-Cutoff $S_0$ für die Distanz und einer Funktion $w$ für den Sichtkegel
+	\begin{align*}
+		w(x,v) &\coloneqq \frac{\gamma}{(q+|x|^2)^{\sigma}}\left(1-S_0(|v|, k_1, d_1) + S_0(|v|, k_1, d_1)\cdot\left(1-S_0\frac{x\cdot v}{|x||v|}, k_2, d_2)\right)\right),
+	\end{align*}
+	wobei $\gamma$ und $\sigma$ die Anziehungsstärke bestimmen und die Cutoff-Funktionen die Anziehung zum einen durch die Geschwindigkeit und zum anderen durch den Sichtkegel des Individuums abschneiden.
+	Der Term für die Randkräfte
+	\begin{align*}
+		B_i &\coloneqq CS_0(\rho_i, k_3, d_3)\cdot v_i^\perp, 
+	\end{align*}
+	mit $\rho_i = \sum^N_{j = 1} \frac{1}{1+|x_i-x_j|^2}$ und $C$ die Stärke der Randkräfte bestimmt.
+	Natürlich mussten wir die Haie nun ebenfalls intelligenter machen. Wir ließen sie nun jagen. Zu jedem Zeitschritt sucht sich jeder Hai jeweils den zu seiner Position nächsten Fisch aus, um ihn zu jagen.
 
 	\section{Animationen}
 % Figures
