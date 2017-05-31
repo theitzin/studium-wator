@@ -21,6 +21,7 @@
 \setlength{\epigraphwidth}{.8\textwidth}
 \usepackage{float}
 \usepackage{todonotes}
+\usepackage[outdir=./]{epstopdf}
 
 % --------------------------------------------------------------------
 % Definitions
@@ -115,16 +116,39 @@
 
 	Wir wollen die Sache jedoch ein wenig genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort auf \wator, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. Das \wator Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai der sich etwa in einer Zelle am rechten Rand befindet und nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht. Die Zeit vergeht in diskreten Zeitabschnitten die Chronen genannt werden, und jeder Fisch oder Hai darf sich pro Chrone um eine Zelle entweder nach Norden, Osten, Süden oder Westen bewegen. Falls jedoch bereits alle benachbarten Zellen durch die eigene Spezies besetzt sind, so entfällt diese Regeln. Die Wahl der Bewegungsrichtung ist für Fisch ganz einfach: Wähle zufällig. Haie haben aufgrund ihrer Natur als Jäger jedoch ein wenig mehr zu beachten. Es gilt: Befindet sich in einer benachbarte Zellen ein oder mehrere Fische, so wähle eine dieser Zellen und bewege dich dort hin -- der Fisch wird dabei gefressen. Falls diese Regel nicht anwendbar ist, so verhalte dich wie ein Fisch und wähle zufällig. \newline
 
-	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben.
+	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben. Für eine erfolgreiche Simulation ist es schlussendlich noch notwendig initiale Parameter für den Anbeginn der Zeit, also $t = 0$ zu wählen. Das sind genau die Anzahl der Fische und Haie und deren Position auf \wator. Die Positionen werden wir in unserer Simulation ganz einfach zufällig wählen, und für die initiale Anzahl von Fischen und Haien verwenden wir die Parameter \texttt{nfish} und \texttt{nshark}.
+
+	Von den idealisierten Lotka-Volterra Gleichungen würden wir uns Sinusähnliche Populationsverläufe erwarten. In der Realität sieht das ganze jedoch naturgemäß komplizierter aus, insbesondere wenn wir nur einen kleinen Planeten simulieren spielt der Zufall eine große Rolle. 
 
 	%\missingfigure{Bewegungsrichtung }
 	%\todo{nfish nshark}
 
 	\begin{figure}
 		\centering
-		\includegraphics[width=0.7\textwidth]{pictures/classic.png}
-		\label{fig:encounter}
+		\includegraphics[width=0.6\textwidth]{pictures/classic2.png}
+		\label{fig:wator}
 		\caption{Ein typischer Tag auf \wator}
+	\end{figure}
+
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{pictures/lotka_volterra.png}
+		\label{fig:lotka_volterra}
+		%\caption{Ein typischer Tag auf \wator}
+	\end{figure}
+
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{pictures/classic_default.png}
+		\label{fig:classic_default}
+		%\caption{Ein typischer Tag auf \wator}
+	\end{figure}
+
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textwidth]{pictures/classic_big.png}
+		\label{fig:classic_big}
+		%\caption{Ein typischer Tag auf \wator}
 	\end{figure}
 
 	\section{Das stetige WATOR Programm}
