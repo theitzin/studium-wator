@@ -146,11 +146,13 @@ Entity.prototype.InterpolationTime = function() {
 Fish = function(pos, behaviourData) {
 	Entity.apply(this, arguments);
 
-	this.velocity = new Vec2(0, 0);
+	var rnd = Math.random();
+	this.velocity = new Vec2(10*Math.cos(rnd*2*Math.PI), 10*Math.sin(rnd*2*Math.PI));
+	this.direction = new Vec2(Math.cos(rnd*2*Math.PI), Math.sin(rnd*2*Math.PI));
+
 	this.dimensions = [10, 8, 10, 5, 13, 2, 14, 7] // length / width of head, body, butt, tail
 	this.UpdateBodyPoints();
 	var colorRange = [0.4, 0.6];
-	var rnd = Math.random();
 	this.colors = [	HSVtoRGB(colorRange[0] + rnd*(colorRange[1] - colorRange[0]), 0.7, 0.8),
 					HSVtoRGB(colorRange[0] + rnd*(colorRange[1] - colorRange[0]), 0.9, 0.6),
 					HSVtoRGB(colorRange[0] + rnd*(colorRange[1] - colorRange[0]), 0.9, 0.5)];
