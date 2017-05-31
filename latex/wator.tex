@@ -232,7 +232,7 @@ Die abstoßende Kraft zwischen zwei Individuen wird dadurch abgeschnitten, wenn 
 	Hierbei ist $\rho_i$ ein Maß für die Einsamkeit eines Fisches. Je kleiner $\rho_i$, desto weiter befindet er sich weg vom Schwarm.
 	Damit verschwindet $B_i$, falls $\rho_i > d_3$.\newline
 	
-	Somit wird nun in jedem Zeitschritt für jeden Fisch eine Differentialgleichung gelöst, was das ganze Unterfangen wesentlich aufwändiger macht. Wir müssen natürlich wieder eine künstliche Beschränkung für die Anzahl an Fischen definieren, da beim möglichen Aussterben der Haie und beim unendlichen Vermehren der Fische der Rechenaufwand und Speicher explodieren würde. \newline
+	Somit wird nun in jedem Zeitschritt für jeden Fisch eine Differentialgleichung gelöst, was das ganze Unterfangen wesentlich aufwändiger macht. Wir müssen natürlich wieder eine künstliche Beschränkung für die Anzahl an Fischen definieren, da beim möglichen Aussterben der Haie und beim unendlichen Vermehren der Fische der Rechenaufwand und Speicher explodieren würde. Zusätzlich geben wir den Fischen ein Alter. Fische die ein gewisses Alter überstreichen, indem sie nicht gefressen wurden, sterben. Das macht die Differentialgleichung stabiler, da Fische hoffentlich sterben, bevor durch die Fehlerfortpflanzung Geschwindigkeiten explodieren können.\newline
 	
 	Im Zuge dessen müssen wir die Haie nun ebenfalls intelligenter machen, da jetzt die Chancen zufällig einen Fisch in der Nähe zu finden geringer sind. Wir lassen sie nun jagen. Zu jedem Zeitschritt sucht sich jeder Hai jeweils den zu seiner Position nächsten Fisch aus, um ihn zu jagen. In jedem Zeitschritt wird also ein neuer Fisch ausgesucht, falls der zuvor ausgewählte nicht mehr der nächste war.\newline
 	
