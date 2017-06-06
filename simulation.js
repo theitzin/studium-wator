@@ -561,43 +561,21 @@ SwarmBehaviour.prototype.fun = function(entity, entityList,entityListFlee) {
 	var vel = entity.velocity.clone();
 
 	//Erweiterte Cucker-Smale-Modelle
-	var s1 = vel.scale(alpha - beta*vel.length2());
-	var s2 = new Vec2(0,0);
-	var Ri = this.R(entity, entityListFlee);
-	var Ri2 = this.R(entity, entityList);
-	//Ri2 = new Vec2(0,0);
-	Ri.add(Ri2);
+	var Ei = vel.scale(alpha - beta*vel.length2());
+	var RiShark = this.R(entity, entityListFlee, 50, 1/3);
+	var RiEigen = this.R(entity, entityList, 0, 1);
+	var Ai = this.A(entity, entityList);
+	var Bi = this.B(entity, entityList);
 
-	//var Ai = this.A(entity, entityList);
-	//var Bi = entity.B(entityList);
 	//var Si = this.S(entity, entityListFlee);
-	//s1 = s1.add(Ri.add(Ai)).scale(1/m);
-		/*
-	// Cucker-Smale Partikel-Modell
-	for(var i = 0; i < N; i++){
-		if(entity.position != entityList[i].position){
-			var vel = entityList[i].direction.clone().sub(entity.direction);
-			var pos = entityList[i].position.clone().sub(entity.position);
-			var r = pos.length()
-			s2 = s2.add(vel.scale(H(r)));
-		}
-	*/
 	//Selbstantriebs, Abbremsungs, und Anziehungs–Abstoßungs-Partikel Modell
-	for(var i = 0; i < N; i++){
-		if(entity.position != entityList[i].position){
-			s2 = s2.add(NablaU(entity.position,entityList[i].position));
-		}
-	}
-	return s1.add(Ri.sub(s2));
+	// for(var i = 0; i < N; i++){
+	// 	if(entity.position != entityList[i].position){
+	// 		s2 = s2.add(NablaU(entity.position,entityList[i].position));
+	// 	}
+	// }
+	return Ei.add(RiEigen.add(RiShark.add(Ai.add(Bi))));
 }
-
-function H(r){
-	var k = 600;
-	var sigma = 1000;
-	var gamma = 1/20;
-
-	return k/Math.pow(sigma+r*r,gamma);
-};
 
 SwarmBehaviour.prototype.S = function(entity, entityList){
 	var beta1 = 1/100;
@@ -613,9 +591,9 @@ SwarmBehaviour.prototype.S = function(entity, entityList){
 	return s;
 };
 
-SwarmBehaviour.prototype.R = function(entity, entityList){
-	var rho = 10;
-	var beta1 = 1/5;
+SwarmBehaviour.prototype.R = function(entity, entityList, int, distInt){
+	var rho = int;
+	var beta1 = distInt;
 	var d = 200;
 	var N = entityList.length;
 
@@ -629,7 +607,7 @@ SwarmBehaviour.prototype.R = function(entity, entityList){
 };
 
 SwarmBehaviour.prototype.B = function(entity, entityList){
-	var d = 400;
+	var d = 0.001;
 	var N = entityList.length;
 	var C = 10;
 
@@ -650,7 +628,7 @@ function cutoff(x,v,d){
 };
 
 SwarmBehaviour.prototype.A = function(entity, entityList){
-	var d = 400;
+	var d = 500;
 	var N = entityList.length;
 
 	var s = new Vec2(0,0);
@@ -659,39 +637,22 @@ SwarmBehaviour.prototype.A = function(entity, entityList){
 		var v = entityList[i].velocity.clone().sub(entity.velocity)
 		var rLen = r.length();
 		var w = wFun(r,entity.velocity.clone());
-		s = s.add(v.scale((1-cutoff(rLen,1,d))*w/N));
+		s = s.add(r.scale((cutoff(rLen,100,d)-1)*w/N));
 	}
 	return s;
 };
 
 function wFun(x,v){
-	var gamma = 30;
+	var gamma = 1000;
 	var delta = 0.30;
-	var q = 10;
-	var sigma = 0.02;
+	var q = 20;
+	var sigma = 1/5;
 
-	var d = 20;
+	var d = 10;
 	var s = gamma/Math.pow(q+x.length2(),sigma);
-	var S1 = cutoff(v.length(),1/d,d);
-	var S2 = 1-cutoff(Math.abs(x.normalize().dot(v.normalize())),1,delta)
+	var S1 = cutoff(v.length(),1,d);
+	var S2 = 1-cutoff(Math.abs(x.normalize().dot(v.normalize())),10,delta)
 	return s*(S1 + (1-S1)*S2);
-};
-
-function NablaU(x1,x2) {
-	//var cA = 20;
-	//var cR = 30;
-	//var lA = 50;
-	//var lR = 20;
-	//var r = Math.max(0.00001,x1.distance(x2));
-	var cA = 100;
-	var cR = 50;
-	var lA = 200;
-	var lR = 100;
-	var r = Math.max(0.00001,x1.distance(x2));
-
-	var dU1 = cA*(x1.x-x2.x)*Math.exp(-r/lA)/(r*lA)-cR*(x1.x-x2.x)*Math.exp(-r/lR)/(r*lR);
-	var dU2 = cA*(x1.y-x2.y)*Math.exp(-r/lA)/(r*lA)-cR*(x1.y-x2.y)*Math.exp(-r/lR)/(r*lR);
-	return new Vec2(dU1, dU2);
 };
 
 
