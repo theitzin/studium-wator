@@ -117,39 +117,38 @@
 
 	Wir wollen die Sache jedoch ein wenig genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort auf \wator, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. Das \wator Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai der sich etwa in einer Zelle am rechten Rand befindet und nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht. Die Zeit vergeht in diskreten Zeitabschnitten die Chronen genannt werden, und jeder Fisch oder Hai darf sich pro Chrone um eine Zelle entweder nach Norden, Osten, Süden oder Westen bewegen. Falls jedoch bereits alle benachbarten Zellen durch die eigene Spezies besetzt sind, so entfällt diese Regeln. Die Wahl der Bewegungsrichtung ist für Fisch ganz einfach: Wähle zufällig. Haie haben aufgrund ihrer Natur als Jäger jedoch ein wenig mehr zu beachten. Es gilt: Befindet sich in einer benachbarte Zellen ein oder mehrere Fische, so wähle eine dieser Zellen und bewege dich dort hin -- der Fisch wird dabei gefressen. Falls diese Regel nicht anwendbar ist, so verhalte dich wie ein Fisch und wähle zufällig. \newline
 
-	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben. Für eine erfolgreiche Simulation ist es schlussendlich noch notwendig initiale Parameter für den Anbeginn der Zeit, also $t = 0$ zu wählen. Das sind genau die Anzahl der Fische und Haie und deren Position auf \wator. Die Positionen werden wir in unserer Simulation ganz einfach zufällig wählen, und für die initiale Anzahl von Fischen und Haien verwenden wir die Parameter \texttt{nfish} und \texttt{nshark}.
-
-	Von den idealisierten Lotka-Volterra Gleichungen würden wir uns Sinusähnliche Populationsverläufe erwarten. In der Realität sieht das ganze jedoch naturgemäß komplizierter aus, insbesondere wenn wir nur einen kleinen Planeten simulieren spielt der Zufall eine große Rolle. 
-
-	%\missingfigure{Bewegungsrichtung }
-	%\todo{nfish nshark}
-
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.6\textwidth]{pictures/classic2.png}
-		\label{fig:wator}
 		\caption{Ein typischer Tag auf \wator}
+		\label{fig:wator}
 	\end{figure}
+
+	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben. Für eine erfolgreiche Simulation ist es schlussendlich noch notwendig initiale Parameter für den Anbeginn der Zeit, also $t = 0$ zu wählen. Das sind genau die Anzahl der Fische und Haie und deren Position auf \wator. Die Positionen werden wir in unserer Simulation ganz einfach zufällig wählen, und für die initiale Anzahl von Fischen und Haien verwenden wir die Parameter \texttt{nfish} und \texttt{nshark}. \newline
 
 	\begin{figure}
 		\centering
 		\includegraphics[width=\textwidth]{pictures/lotka_volterra.png}
+		\caption{Die Lotka-Volerra Gleichungen prognostizieren zwei zeitverschobene, periodische Populationsverläufe.}
 		\label{fig:lotka_volterra}
-		%\caption{Ein typischer Tag auf \wator}
 	\end{figure}
+
+	Von den idealisierten Lotka-Volterra Gleichungen würden wir uns periodische, fast Sinusähnliche, Populationsverläufe erwarten. In der Realität sieht das ganze jedoch naturgemäß komplizierter aus, insbesondere wenn wir nur einen kleinen Planeten simulieren spielt der Zufall eine große Rolle. In Abbildung \ref{fig:classic_default} sehen wir einen typischen Verlauf der Populationen über $500$ Chronen. Es ist deutlich ersichtlich, wie die beiden Populationen wesentlich durch die jeweils andere beeinflusst werden. Während die Haie besonders durch vermehrtes Fischvorkommen gedeihen, gilt gerade das Gegenteil für die Fische bei starkem Haizuwachs. Zudem bemerken wir, dass die Maxima der Räuberpopulation relativ konstant etwa $10\%-15\%$ der Maxima der Beutepopulation entspricht, es wird also trotz starkem Einfluss durch zufällige Ereignisse in den vielen Fällen zumindest für einen gewissen Zeitraum ein Äquilibrium erreicht. Dieser annähernd stabile Zustand wird jedoch meist durch einen von zwei Fällen beendet. Im ersten Fall versäumen es die Jäger sich ausreichend über den gesamten Planeten zu verteilen, wodurch nach kurzer Zeit das lokale Beuteaufkommen zur Neige geht und die Jäger verhungern. Daraufhin können sich die Fische ungehindert vermehren, bis der gesamte Planet \wator mit Fischen bedeckt ist. Im zweiten Fall gelingt es den Haien sich bei der Jagd so gewitzt anzustellen, dass schlussendlich jeder einzelne Fisch gefressen wird, was wiederum wie im ersten Fall den Untergang der Jägerpopulation zur Folge hat. Sofern sich kein perfektes Äquilibrium bildet, ist das Schicksal der Jäger hier also immer früher oder später auszusterben. \newline
 
 	\begin{figure}
 		\centering
 		\includegraphics[width=\textwidth]{pictures/classic_default.png}
+		\caption{Beispiel eines Polulationsverlaufs auf einem kleinen Planeten mit $20 \times 20$ Zellen.}
 		\label{fig:classic_default}
-		%\caption{Ein typischer Tag auf \wator}
 	\end{figure}
+
+	Dieses Schicksal der Jäger kann durch geschickte Wahl der fünf Parameter \texttt{fbreed}, \texttt{hbreed}, \texttt{starve}, \texttt{nfish} und \texttt{nshark}, sowie insbesondere durch die Simulation eines größeren Planeten hinausgezögert werden. Tatsächlich ist es möglich Parameter so zu wählen, dass die beiden Populationen Stunden, oder sogar Tagelang stabil bleiben. In Abbildung \ref{fig:classic_big} sehen wir etwa die Simulation eines Planeten der Größe $45 \times 45$. Während auch hier die Anzahl der Haie relativ zu den Fischen nur etwa $10\%$ ausmacht, sieht es hier zumindest absolut gesehen deutlich besser aus. Im Allgemeinen sind hier zu jedem Zeitpunkt mindestens noch $50$ Haie am Leben, wodurch ein Aussterben statistisch zumindest auf kurze Zeit gesehen unwahrscheinlich wird.
 
 	\begin{figure}
 		\centering
 		\includegraphics[width=\textwidth]{pictures/classic_big.png}
+		\caption{Beispiel eines Polulationsverlaufs auf einem größeren Planeten mit $45 \times 45$ Zellen.}
 		\label{fig:classic_big}
-		%\caption{Ein typischer Tag auf \wator}
 	\end{figure}
 
 	\section{Das stetige WATOR Programm}
@@ -158,8 +157,8 @@
 	\begin{figure}
 		\centering
 		\includegraphics[width=0.7\textwidth]{pictures/continuous.png}
-		\label{fig:continuous}
 		\caption{Das stetige \wator}
+		\label{fig:continuous}
 	\end{figure}
 	Diese Anpassung bringt aber einige Probleme mit sich, wie man schnell bemerkt.\newline
 	
@@ -205,8 +204,8 @@ in einer gewissen Geschwindigkeit fort zu bewegen. Der Parameter $\beta$ ist hin
 	\begin{figure}
 	\centering
 	\includegraphics[width=0.4\textwidth]{pictures/cutoff.png}
-		\label{fig:cutoff}
 		\caption{Cutoff-Funktion \cite{agueh2011analysis}}
+		\label{fig:cutoff}
 	\end{figure}
 	wobei $d$ die Position und $k$ die Schärfe des Cutoffs bestimmt. 
 Die abstoßende Kraft zwischen zwei Individuen wird dadurch abgeschnitten, wenn ihr Abstand größer als $d$ ist.
@@ -242,19 +241,16 @@ Die abstoßende Kraft zwischen zwei Individuen wird dadurch abgeschnitten, wenn 
 	\begin{figure}
 	\centering
 	\includegraphics[width=0.7\textwidth]{pictures/continuous_diagram.png}
-		\label{fig:continuous_diagram}
 		\caption{Typischer Populationsverlauf beim stetigen \wator}
+		\label{fig:continuous_diagram}
 	\end{figure}
-
-	\section{Animationen}
 % Figures
 	
 	\listoffigures
 	
 % Literatur 
 
-
 	\nocite{*}
-	%\printbibliography[heading=bibintoc]% show bibliography in toc
+	\printbibliography[heading=bibintoc]% show bibliography in toc
 	
 \end{document}
