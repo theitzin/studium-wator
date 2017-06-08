@@ -32,7 +32,7 @@
 \newcommand{\N}{\ensuremath{\mathbb{N}}}   % natürliche Zahlen
 \newcommand{\iu}{{i\mkern1mu}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert_2}
-\newcommand{\wator}{\textsc{Wator }}
+\newcommand{\wator}{\textsc{Wator}}
 
 %\theoremstyle{plain}
 \newtheorem{theorem}{Satz}[section] % reset theorem numbering for each chapter
@@ -107,7 +107,7 @@
 
 	\section{Das klassische WATOR Programm}
 
-	Das \wator Programm (abgeleitet von Water-Torus) beschreibt ein einfaches Räuber-Beute Modell, die Beute - in unserem Fall Fische haben immer ausreichend Futter und keine natürliche Sterberate. Einzig die Räuber - in unserem Fall Haie können ihnen gefährlich werden, diese können ohne Fische als Nahrungsquelle nicht überleben und würden nach kurzer Zeit aussterben. Wäre das auch schon das ganze Modell, so könnte man diese Zusammenhänge durch die klassischen Lotka-Volterra Gleichungen beschreiben
+	Das \wator\ Programm (abgeleitet von Water-Torus) beschreibt ein einfaches Räuber-Beute Modell, die Beute - in unserem Fall Fische haben immer ausreichend Futter und keine natürliche Sterberate. Einzig die Räuber - in unserem Fall Haie können ihnen gefährlich werden, diese können ohne Fische als Nahrungsquelle nicht überleben und würden nach kurzer Zeit aussterben. Wäre das auch schon das ganze Modell, so könnte man diese Zusammenhänge durch die klassischen Lotka-Volterra Gleichungen beschreiben
 	\begin{align} \label{eq:lotka_volterra}
 		x_B'(t) &= x_B(t) \left(\alpha - \beta x_R(t)\right) \\
 		x_R'(t) &= x_R(t) \left(\gamma x_B(t) - \delta\right) \nonumber
@@ -115,7 +115,7 @@
 
 	Das Wachstum der Beute $b(t)$ ist abhängig von der aktuellen Beutepopulation, sowie auf positive Weise von der Reproduktionsrate $\alpha > 0$, und negativ durch die von den Räuber verursachte Sterberate $\beta > 0$. Ganz ähnlich ist das zeitliche Verhalten der Räuberpopulation proportional zur Fressrate pro Beutelebewesen $\gamma > 0$ und zur natürlichen Sterberate $\delta > 0$ wenn keine Beute vorhanden ist. \newline
 
-	Wir wollen die Sache jedoch ein wenig genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort auf \wator, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. Das \wator Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai der sich etwa in einer Zelle am rechten Rand befindet und nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht. Die Zeit vergeht in diskreten Zeitabschnitten die Chronen genannt werden, und jeder Fisch oder Hai darf sich pro Chrone um eine Zelle entweder nach Norden, Osten, Süden oder Westen bewegen. Falls jedoch bereits alle benachbarten Zellen durch die eigene Spezies besetzt sind, so entfällt diese Regeln. Die Wahl der Bewegungsrichtung ist für Fisch ganz einfach: Wähle zufällig. Haie haben aufgrund ihrer Natur als Jäger jedoch ein wenig mehr zu beachten. Es gilt: Befindet sich in einer benachbarte Zellen ein oder mehrere Fische, so wähle eine dieser Zellen und bewege dich dort hin -- der Fisch wird dabei gefressen. Falls diese Regel nicht anwendbar ist, so verhalte dich wie ein Fisch und wähle zufällig. \newline
+	Wir wollen die Sache jedoch ein wenig genauer wissen. Anstatt idealisierte stetige Populationsgrößen $x_B, x_R$ anzunehmen, wollen wir tatsächlich eine diskrete Anzahl von einzelne Lebewesen simulieren, und deren Erfolg (oder Scheitern) von ihrem Aufenthaltsort auf \wator, sowie anderen Lebewesen in unmittelbarer Nähe abhängig machen. Das \wator\ Programm enthält einige einfache Regeln, die das Verhalten der Fische und Haie bestimmen. Der Ozean, in dem sie sich tummeln, besteht aus einem rechteckigen Gitter, dessen gegenüberliegende Seiten verbunden werden. Das heißt einfach, dass ein Fisch oder Hai der sich etwa in einer Zelle am rechten Rand befindet und nach rechts schwimmt, in der entsprechenden Zelle am linken Rand wieder auftaucht. Die Zeit vergeht in diskreten Zeitabschnitten die Chronen genannt werden, und jeder Fisch oder Hai darf sich pro Chrone um eine Zelle entweder nach Norden, Osten, Süden oder Westen bewegen. Falls jedoch bereits alle benachbarten Zellen durch die eigene Spezies besetzt sind, so entfallen diese Regeln. Die Wahl der Bewegungsrichtung ist für Fische ganz einfach: Wähle zufällig. Haie haben aufgrund ihrer Natur als Jäger jedoch ein wenig mehr zu beachten. Es gilt: Befindet sich in den benachbarten Zellen ein oder mehrere Fische, so wähle eine dieser Zellen und bewege dich dort hin -- der Fisch wird dabei gefressen. Falls diese Regel nicht anwendbar ist, so verhalte dich wie ein Fisch und wähle zufällig. \newline
 
 	\begin{figure}
 		\centering
@@ -124,7 +124,7 @@
 		\label{fig:wator}
 	\end{figure}
 
-	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben. Für eine erfolgreiche Simulation ist es schlussendlich noch notwendig initiale Parameter für den Anbeginn der Zeit, also $t = 0$ zu wählen. Das sind genau die Anzahl der Fische und Haie und deren Position auf \wator. Die Positionen werden wir in unserer Simulation ganz einfach zufällig wählen, und für die initiale Anzahl von Fischen und Haien verwenden wir die Parameter \texttt{nfish} und \texttt{nshark}. \newline
+	Zusätzlich zu diesen Bewegungsregeln dürfen sich unsere \wator\ Bewohner unter bestimmten Voraussetzungen vermehren. Für unsere Fische führen wir dafür einen zusätzlichen Parameter \texttt{fbreed} ein, welcher die Zeit -- also die Anzahl der Chronen -- angibt die die Fische am Leben sein müssen bevor sie sich vermehren dürfen. Ganz analog verwenden wir für die Haie den Wert \texttt{hbreed} und noch einen zusätzlich Parameter \texttt{starve} der angibt wie viele Chronen ein Hai überleben kann ohne gefressen zu haben. Für eine erfolgreiche Simulation ist es schlussendlich noch notwendig initiale Parameter für den Anbeginn der Zeit, also $t = 0$ zu wählen. Das sind genau die Anzahl der Fische und Haie und deren Position auf \wator. Die Positionen werden wir in unserer Simulation ganz einfach zufällig wählen, und für die initiale Anzahl von Fischen und Haien verwenden wir die Parameter \texttt{nfish} und \texttt{nshark}. \newline
 
 	\begin{figure}
 		\centering
@@ -133,7 +133,7 @@
 		\label{fig:lotka_volterra}
 	\end{figure}
 
-	Von den idealisierten Lotka-Volterra Gleichungen würden wir uns periodische, fast Sinusähnliche, Populationsverläufe erwarten. In der Realität sieht das ganze jedoch naturgemäß komplizierter aus, insbesondere wenn wir nur einen kleinen Planeten simulieren spielt der Zufall eine große Rolle. In Abbildung \ref{fig:classic_default} sehen wir einen typischen Verlauf der Populationen über $500$ Chronen. Es ist deutlich ersichtlich, wie die beiden Populationen wesentlich durch die jeweils andere beeinflusst werden. Während die Haie besonders durch vermehrtes Fischvorkommen gedeihen, gilt gerade das Gegenteil für die Fische bei starkem Haizuwachs. Zudem bemerken wir, dass die Maxima der Räuberpopulation relativ konstant etwa $10\%-15\%$ der Maxima der Beutepopulation entspricht, es wird also trotz starkem Einfluss durch zufällige Ereignisse in den vielen Fällen zumindest für einen gewissen Zeitraum ein Äquilibrium erreicht. Dieser annähernd stabile Zustand wird jedoch meist durch einen von zwei Fällen beendet. Im ersten Fall versäumen es die Jäger sich ausreichend über den gesamten Planeten zu verteilen, wodurch nach kurzer Zeit das lokale Beuteaufkommen zur Neige geht und die Jäger verhungern. Daraufhin können sich die Fische ungehindert vermehren, bis der gesamte Planet \wator mit Fischen bedeckt ist. Im zweiten Fall gelingt es den Haien sich bei der Jagd so gewitzt anzustellen, dass schlussendlich jeder einzelne Fisch gefressen wird, was wiederum wie im ersten Fall den Untergang der Jägerpopulation zur Folge hat. Sofern sich kein perfektes Äquilibrium bildet, ist das Schicksal der Jäger hier also immer früher oder später auszusterben. \newline
+	Von den idealisierten Lotka-Volterra Gleichungen würden wir uns periodische, fast Sinusähnliche, Populationsverläufe erwarten. In der Realität sieht das ganze jedoch naturgemäß komplizierter aus, insbesondere wenn wir nur einen kleinen Planeten simulieren spielt der Zufall eine große Rolle. In Abbildung \ref{fig:classic_default} sehen wir einen typischen Verlauf der Populationen über $500$ Chronen. Es ist deutlich ersichtlich, wie die beiden Populationen wesentlich durch die jeweils andere beeinflusst werden. Während die Haie besonders durch vermehrtes Fischvorkommen gedeihen, gilt gerade das Gegenteil für die Fische bei starkem Haizuwachs. Zudem bemerken wir, dass die Maxima der Räuberpopulation relativ konstant etwa $10\%-15\%$ der Maxima der Beutepopulation entspricht, es wird also trotz starkem Einfluss durch zufällige Ereignisse in den vielen Fällen zumindest für einen gewissen Zeitraum ein Äquilibrium erreicht. Dieser annähernd stabile Zustand wird jedoch meist durch einen von zwei Fällen beendet. Im ersten Fall versäumen es die Jäger sich ausreichend über den gesamten Planeten zu verteilen, wodurch nach kurzer Zeit das lokale Beuteaufkommen zur Neige geht und die Jäger verhungern. Daraufhin können sich die Fische ungehindert vermehren, bis der gesamte Planet \wator\ mit Fischen bedeckt ist. Im zweiten Fall gelingt es den Haien sich bei der Jagd so gewitzt anzustellen, dass schlussendlich jeder einzelne Fisch gefressen wird, was wiederum wie im ersten Fall den Untergang der Jägerpopulation zur Folge hat. Sofern sich kein perfektes Äquilibrium bildet, ist das Schicksal der Jäger hier also immer früher oder später auszusterben. \newline
 
 	\begin{figure}
 		\centering
@@ -164,7 +164,7 @@
 	
 	Zunächst würden Haie nun aussterben, suchten sie nur auf den benachbarten Pixeln nach Nahrung, Sie wären also sozusagen blind und würden erst dann einen Fisch fressen, wenn er sie berührt. Deshalb definieren wir eine Suchtoleranz, sodass Haie nach Fischen suchen, die sich innerhalb dieser befinden. Findet ein Hai zum gegebenen Chrone Fische, welche sich in dieser Umgebung aufhalten, so wählt er einen dieser Fische zufällig aus und macht ihn zu seiner Nahrung.\newline
 	
-	Ein weiteres Problem stellen die Bewegungsabläufe dar. Zuvor ließen wir die Bewohner zufällig in eine der vier Himmelsrichtungen schwimmen. Beim stetigen \wator haben wir aber weit mehr mögliche Schwimmrichtungen. Man könnte als erstes versuchen für jedes Tier in jedem Schritt eine gleichverteilte Zufallszahl zu erzeugen, welche den Winkel der Schwimmrichtung bestimmt.
+	Ein weiteres Problem stellen die Bewegungsabläufe dar. Zuvor ließen wir die Bewohner zufällig in eine der vier Himmelsrichtungen schwimmen. Beim stetigen \wator\ haben wir aber weit mehr mögliche Schwimmrichtungen. Man könnte als erstes versuchen für jedes Tier in jedem Schritt eine gleichverteilte Zufallszahl zu erzeugen, welche den Winkel der Schwimmrichtung bestimmt.
 	Lässt man die Simulation nun mit diesen Änderungen laufen, so sieht das Ergebnis äußerst ernüchternd aus.
 	Sowohl die Haie als auch die Fische schwimmen orientierungslos umher und bewegen sich eher wie die Nadel eines Kompasses, die von einem Magneten gestörte wird. 
 	Damit diese unnatürlichen Bewegungen vermieden werden, könnte man zum Beispiel die neue Schwimmrichtung so wählen, dass sie einen zufällig gewählten aber beschränkten Winkel mit der alten Schwimmrichtung einschließt.\newline
@@ -172,7 +172,7 @@
 	Allerdings stellen uns all diese Nachbesserungen immer noch nicht zufrieden. Die Fische schwimmen jetzt zwar natürlicher aber dennoch sehen sie recht verloren und orientierungslos aus. Wir wollen daher einen Schritt weiter gehen und die Simulation so realistisch wie möglich machen. Also implementieren wir ein Schwarmverhalten für die Fische, um sie mit ein wenig mehr Intelligenz zu versehen.
 	
 	\subsection{Schwarmverhalten}
-	Als Modell für das Schwarmverhalten nehmen wir das verfeinerte Cucker-Smale nach ~\cite{agueh2011analysis}. 
+	Als Modell für das Schwarmverhalten nehmen wir das verfeinerte Cucker-Smale Modell nach Agueh et al. \cite{agueh2011analysis}. 
 	Die Bewegungsänderung für jedes Individuum wird dabei durch ein System von nichtlinearen Differentialgleichungen beschrieben.
 	\begin{align*}
 		\frac{d}{dt}x_i &= v_i\\
@@ -193,14 +193,15 @@ in einer gewissen Geschwindigkeit fort zu bewegen. Der Parameter $\beta$ ist hin
 		\end{equation}
 		ist.
 	\subsubsection{Abstoßung}
-	Für das Verhalten der Fische wollen wir nicht nur, dass sie sich gegenseitig abstoßen, falls sie sich zu nahe kommen, sondern auch, dass sie in der Lage sind von Haien davon zu schwimmen, falls diese ihnen zu nahe kamen. Deswegen Verwenden wir zwei verschiedene Abstoßterme
+	Für das Verhalten der Fische wollen wir nicht nur, dass sie sich gegenseitig abstoßen, falls sie sich zu nahe kommen, sondern auch, dass sie in der Lage sind von Haien davon zu schwimmen, falls diese ihnen zu nahe kommen. Deswegen Verwenden wir zwei verschiedene Abstoßterme
 	\begin{align*}
 		R^{f,s}_i &\coloneqq \frac{\rho}{N_{f,s}}\sum^N_{j=1} S_0(|x_i-x_j|, k_{f,s}, d_{f,s})\frac{x_i-x_j}{\left(1+|x_i-x_j|^2\right)^{\gamma}},
 	\end{align*}
-	wobei $\rho$ und $\gamma$ die Stärke der Abstoßung bestimmen und mit einer Cutoff Funktion Abbildung \ref{fig:cutoff} für die Distanz
+	wobei $\rho$ und $\gamma$ die Stärke der Abstoßung bestimmen und mit einer Cutoff Funktion (Abbildung \ref{fig:cutoff})
 	\begin{align*}
-		S_0(x, k, d) \coloneqq \frac{1}{2}(1-\tanh(k(x-d))),
+		S_0(x, k, d) \coloneqq \frac{1}{2}(1-\tanh(k(x-d)))
 	\end{align*}
+	 für die Distanz,
 	\begin{figure}
 	\centering
 	\includegraphics[width=0.4\textwidth]{pictures/cutoff.png}
@@ -236,7 +237,7 @@ Die abstoßende Kraft zwischen zwei Individuen wird dadurch abgeschnitten, wenn 
 	Im Zuge dessen müssen wir die Haie nun ebenfalls intelligenter machen, da jetzt die Chancen zufällig einen Fisch in der Nähe zu finden geringer sind. Wir lassen sie nun jagen. Zu jedem Zeitschritt sucht sich jeder Hai jeweils den zu seiner Position nächsten Fisch aus, um ihn zu jagen. In jedem Zeitschritt wird also ein neuer Fisch ausgesucht, falls der zuvor ausgewählte nicht mehr der nächste war.\newline
 	
 	Mit diesen Erweiterungen gelingt es tatsächlich meist stabile Populationsschwankung zu erhalten, ohne dass eine Spezies ausstirbt.
-	Dabei treten Populationsverläufe (Abblindung \ref{fig:continuous_diagram}) auf, welche stark an jene der Lotka-Volterra Gleichungen erinnern.
+	Dabei treten Populationsverläufe (Abblindung \ref{fig:continuous_diagram} mit zum jeweiligen Populationsmaximum relativen Bevölkerungszahlen) auf, welche stark an jene der Lotka-Volterra Gleichungen erinnern.
 	
 	\begin{figure}
 	\centering
