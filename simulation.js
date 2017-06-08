@@ -543,7 +543,7 @@ SwarmBehaviour.prototype = Object.create(Behaviour.prototype);
 SwarmBehaviour.prototype.constructor = Behaviour;
 
 SwarmBehaviour.prototype.NextPosition = function(entity, entityList,entityListFlee) {
-	var h = 0.1;
+	var h = 0.08;
 	var vel = entity.velocity.clone();
 	var pos = entity.position.clone();
 	var f = this.fun(entity, entityList,entityListFlee);
