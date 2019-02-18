@@ -1,2 +1,4 @@
 # studium-wator
-Simulation of fish population
+An implementation of the wator predator/prey model. Hosted on www.thhe.me/wator.
+
+![Wator](wator.png)
